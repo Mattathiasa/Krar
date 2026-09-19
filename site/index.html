@@ -1,0 +1,360 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Krar &amp; Begena Studio — microtonal lyre synthesiser</title>
+<meta name="description" content="A playable Ethiopian begena, krar and piano in the browser. Physically modelled strings in Rust, compiled to WebAssembly for the web and to a native framework for iOS.">
+<meta property="og:title" content="Krar &amp; Begena Studio">
+<meta property="og:description" content="Play the notes between the piano keys: a microtonal Ethiopian lyre synthesiser with a Karplus-Strong engine in Rust.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=Noto+Sans+Ethiopic:wght@400;600&amp;display=swap" rel="stylesheet">
+<style>
+:root{
+  --ground:#15120E; --panel:#1A1511; --surface:#1F1A15; --raised:#221C16; --line:#3B3229;
+  --text:#F3EADB; --muted:#B3A391; --dim:#8C7D6C;
+  --saffron:#E8B04A; --saffron-light:#F6D08A; --terracotta:#E2683C; --rose:#D94F7A;
+  --violet:#A77BDB; --green:#4DB38A; --blue:#5E8FE6; --teal:#74B8AC;
+  --sans:'IBM Plex Sans',system-ui,sans-serif; --mono:'IBM Plex Mono',ui-monospace,monospace;
+  --serif:'Instrument Serif',Georgia,serif;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--text);font-family:var(--sans);line-height:1.55;-webkit-font-smoothing:antialiased}
+a{color:var(--saffron)}
+a:hover{color:var(--saffron-light)}
+.wrap{max-width:1100px;margin:0 auto;padding:0 24px}
+.band{height:10px;width:100%;background-image:repeating-linear-gradient(90deg,var(--saffron) 0 15px,var(--green) 15px 30px,var(--terracotta) 30px 45px,var(--blue) 45px 60px);
+  -webkit-mask-image:repeating-linear-gradient(90deg,transparent 0,#000 2px,#000 13px,transparent 15px);mask-image:repeating-linear-gradient(90deg,transparent 0,#000 2px,#000 13px,transparent 15px)}
+header{padding:20px 0;display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.word{font-family:var(--serif);font-size:30px;line-height:1}
+.kicker{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.kicker.hot{color:var(--saffron)}
+h1{font-family:var(--serif);font-weight:400;font-size:clamp(40px,7vw,76px);line-height:1.02;margin:16px 0 0}
+h1 em{font-style:italic;color:var(--saffron)}
+h2{font-family:var(--serif);font-weight:400;font-size:clamp(28px,4vw,40px);line-height:1.1;margin:0 0 8px}
+h3{font-size:19px;font-weight:600;margin:0 0 6px}
+p{color:var(--muted);margin:12px 0 0}
+p.lead{font-size:18px;max-width:62ch}
+section{padding:56px 0;border-top:1px solid var(--line)}
+section:first-of-type{border-top:0}
+.cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:28px}
+.btn{display:inline-flex;align-items:center;gap:10px;min-height:52px;padding:0 24px;border-radius:12px;font-weight:600;text-decoration:none;font-size:16px}
+.btn-primary{background:var(--saffron);color:var(--ground)}
+.btn-primary:hover{background:var(--saffron-light);color:var(--ground)}
+.btn-ghost{border:1px solid var(--line);background:var(--surface);color:var(--text)}
+.btn-ghost:hover{background:var(--raised);color:var(--text)}
+.hint{font-family:var(--mono);font-size:12px;color:var(--dim);margin-top:14px}
+.grid{display:grid;gap:16px;margin-top:28px}
+.cols-3{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.cols-2{grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:22px;border-top-width:4px;border-top-style:solid}
+.card p{font-size:14px;margin-top:8px}
+.card .tag{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+pre{background:var(--raised);border:1px solid var(--line);border-radius:12px;padding:16px;overflow:auto;font-family:var(--mono);font-size:13px;color:var(--text);margin-top:16px}
+figure{margin:0}
+.shots{display:grid;gap:24px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));margin-top:28px;align-items:start}
+.shots img{width:100%;height:auto;border-radius:20px;border:1px solid var(--line);display:block;background:var(--surface)}
+figcaption{font-family:var(--mono);font-size:12px;color:var(--dim);margin-top:10px;text-align:center}
+.ruler{margin-top:28px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px;overflow-x:auto}
+.ruler svg{min-width:720px;width:100%;height:auto;display:block}
+.legend{display:flex;gap:20px;flex-wrap:wrap;font-size:13px;color:var(--muted);margin-top:16px}
+.legend span{display:inline-flex;align-items:center;gap:8px}
+.dot{width:12px;height:12px;border-radius:50%;background:var(--saffron)}
+.tick{width:2px;height:14px;background:var(--teal)}
+.bar{width:18px;height:4px;border-radius:2px;background:var(--teal)}
+ul.facts{list-style:none;padding:0;margin:20px 0 0;display:grid;gap:10px}
+ul.facts li{color:var(--muted);padding-left:20px;position:relative;font-size:15px}
+ul.facts li::before{content:"";position:absolute;left:0;top:9px;width:8px;height:8px;border-radius:50%;background:var(--saffron)}
+.geez{font-family:'Noto Sans Ethiopic',sans-serif}
+footer{border-top:1px solid var(--line);padding:32px 0 56px;color:var(--dim);font-size:14px}
+footer a{color:var(--muted)}
+@media (prefers-reduced-motion:no-preference){.btn{transition:background 160ms}}
+</style>
+</head>
+<body>
+<div class="band" aria-hidden="true"></div>
+<div class="wrap">
+
+  <header>
+    <span class="word">Krar &amp; Begena</span>
+    <span class="kicker hot">Studio</span>
+    <span class="kicker" style="margin-left:auto"><a href="https://github.com/Mattathiasa/Krar">github.com/Mattathiasa/Krar</a></span>
+  </header>
+
+  <section>
+    <div class="kicker">Ethiopian lyres · <span class="geez">ቅኝት</span></div>
+    <h1>Play the notes <em>between the piano keys</em></h1>
+    <p class="lead">A begena, a krar and a piano you can play in the browser, tuned to the four Ethiopian qenet. Every note is a physically modelled string: a Karplus-Strong engine written in Rust, with no samples anywhere in the project.</p>
+    <div class="cta">
+      <a class="btn btn-primary" href="app/">Open the studio</a>
+      <a class="btn btn-ghost" href="https://github.com/Mattathiasa/Krar">Read the code</a>
+    </div>
+    <p class="hint">Runs in your browser · sound starts on your first tap · best with headphones</p>
+  </section>
+
+  <section>
+    <h2>Five ways in</h2>
+    <div class="grid cols-3">
+      <div class="card" style="border-top-color:var(--saffron)">
+        <div class="tag">Play</div>
+        <h3>A begena you can strum</h3>
+        <p>Five colour-coded strings. Touch one to pluck it, drag across to strum, ten fingers at once. A live oscilloscope shows the real output.</p>
+      </div>
+      <div class="card" style="border-top-color:var(--terracotta)">
+        <div class="tag">Piano</div>
+        <h3>Hear the gap</h3>
+        <p>A keyboard with each qenet degree laid over it. Compare mode plays the nearest piano key, then the Ethiopian pitch.</p>
+      </div>
+      <div class="card" style="border-top-color:var(--blue)">
+        <div class="tag">Scales</div>
+        <h3>Measured in cents</h3>
+        <p>All four qenet against equal temperament, showing which way and how far each degree leans. Every scale plays.</p>
+      </div>
+      <div class="card" style="border-top-color:var(--rose)">
+        <div class="tag">Tab Tutor</div>
+        <h3>Play along in time</h3>
+        <p>A six-string krar tab with a moving playhead, tempo and loop. Tap along and your timing is scored against the beat.</p>
+      </div>
+      <div class="card" style="border-top-color:var(--green)">
+        <div class="tag">Engine</div>
+        <h3>See the signal path</h3>
+        <p>The threads, the delay line and the damping, drawn as they actually run on the platform you are using.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>The four qenet, in cents</h2>
+    <p class="lead">Teal ticks are the twelve piano keys. Each dot is a scale degree where it truly falls, and the bar shows the distance between the two. That distance is the whole point: 282 sits 18 cents below D&#9839;, 678 sits 22 below G.</p>
+    <div class="ruler">
+    <svg viewBox="0 0 1000 396" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="The four qenet plotted in cents against the twelve equal-tempered piano keys">
+      <text x="0" y="38" fill="#E8B04A" font-family="Instrument Serif,Georgia,serif" font-size="26">Tizita Minor</text>
+      <text x="24.0" y="38" fill="#8C7D6C" font-family="IBM Plex Mono,monospace" font-size="12" text-anchor="start">ትዝታ</text>
+      <line x1="24" y1="72" x2="976" y2="72" stroke="#4A3F33"/>
+      <line x1="24.0" y1="64" x2="24.0" y2="80" stroke="#74B8AC" stroke-opacity="0.5" stroke-width="2"/>
+      <line x1="103.3" y1="64" x2="103.3" y2="80" stroke="#74B8AC" stroke-opacity="0.5" stroke-width="2"/>
+      <line x1="182.7" y1="64" x2="182.7" y2="80" stroke="#74B8AC" stroke-opacity="0.5" stroke-width="2"/>
+      <line x1="262.0" y1="64" x2="262.0" y2="80" stroke="#74B8AC" stroke-opacity="0.5" stroke-width="2"/>
+      <line x1="341.3" y1="64" x2="341.3" y2="80" stroke="#74B8AC" stroke-opacity="0.5" stroke-width="2"/>
+      <line x1="420.7" y1="64" x2="420.7" y2="80" stroke="#74B8AC" stroke-opacity="0.5" stroke-width="2"/>
+      <line x1="500.0" y1="64" x2="500.0" y2="80" stroke="#74B8AC" stroke-opacity="0.5" stroke-width="2"/>
+      <line x1="579.3" y1="64" x2="579.3" y2="80" stroke="#74B8AC" stroke-opacity="0.5" stroke-width="2"/>
+      <line x1="658.7" y1="64" x2="658.7" y2="80" stroke="#74B8AC" stroke-opacity="0.5" stroke-width="2"/>
+      <line x1="738.0" y1="64" x2="738.0" y2="80" stroke="#74B8AC" stroke-opacity="0.5" stroke-width="2"/>
+      <line x1="817.3" y1="64" x2="817.3" y2="80" stroke="#74B8AC" stroke-opacity="0.5" stroke-width="2"/>
+      <line x1="896.7" y1="64" x2="896.7" y2="80" stroke="#74B8AC" stroke-opacity="0.5" stroke-width="2"/>
+      <line x1="976.0" y1="64" x2="976.0" y2="80" stroke="#74B8AC" stroke-opacity="0.5" stroke-width="2"/>
+      <rect x="24.0" y="69.5" width="0.0" height="5" rx="2.5" fill="#74B8AC"/>
+      <circle cx="24.0" cy="72" r="8" fill="#E8B04A" stroke="#15120E" stroke-width="3"/>
+      <text x="24.0" y="98" fill="#8C7D6C" font-family="IBM Plex Mono,monospace" font-size="12" text-anchor="middle">±0</text>
+      <rect x="247.7" y="69.5" width="14.3" height="5" rx="2.5" fill="#74B8AC"/>
+      <circle cx="247.7" cy="72" r="8" fill="#E8B04A" stroke="#15120E" stroke-width="3"/>
+      <text x="247.7" y="98" fill="#74B8AC" font-family="IBM Plex Mono,monospace" font-size="12" text-anchor="middle">−18</text>
+      <rect x="330.2" y="69.5" width="11.1" height="5" rx="2.5" fill="#74B8AC"/>
+      <circle cx="330.2" cy="72" r="8" fill="#E8B04A" stroke="#15120E" stroke-width="3"/>
+      <text x="330.2" y="98" fill="#8C7D6C" font-family="IBM Plex Mono,monospace" font-size="12" text-anchor="middle">−14</text>
+      <rect x="420.7" y="69.5" width="15.9" height="5" rx="2.5" fill="#74B8AC"/>
+      <circle cx="436.5" cy="72" r="8" fill="#E8B04A" stroke="#15120E" stroke-width="3"/>
+      <text x="436.5" y="98" fill="#74B8AC" font-family="IBM Plex Mono,monospace" font-size="12" text-anchor="middle">+20</text>
+      <rect x="561.9" y="69.5" width="17.5" height="5" rx="2.5" fill="#74B8AC"/>
+      <circle cx="561.9" cy="72" r="8" fill="#E8B04A" stroke="#15120E" stroke-width="3"/>
+      <text x="561.9" y="98" fill="#74B8AC" font-family="IBM Plex Mono,monospace" font-size="12" text-anchor="middle">−22</text>
+      <rect x="725.3" y="69.5" width="12.7" height="5" rx="2.5" fill="#74B8AC"/>
+      <circle cx="725.3" cy="72" r="8" fill="#E8B04A" stroke="#15120E" stroke-width="3"/>
+      <text x="725.3" y="98" fill="#74B8AC" font-family="IBM Plex Mono,monospace" font-size="12" text-anchor="middle">−16</text>
+      <rect x="817.3" y="69.5" width="14.3" height="5" rx="2.5" fill="#74B8AC"/>
+      <circle cx="831.6" cy="72" r="8" fill="#E8B04A" stroke="#15120E" stroke-width="3"/>
+      <text x="831.6" y="98" fill="#74B8AC" font-family="IBM Plex Mono,monospace" font-size="12" text-anchor="middle">+18</text>
+      <rect x="896.7" y="69.5" width="28.6" height="5" rx="2.5" fill="#74B8AC"/>
+      <circle cx="925.2" cy="72" r="8" fill="#E8B04A" stroke="#15120E" stroke-width="3"/>
+      <text x="925.2" y="98" fill="#74B8AC" font-family="IBM Plex Mono,monospace" font-size="12" text-anchor="middle">+36</text>
+      <text x="0" y="124" fill="#E2683C" font-family="Instrument Serif,Georgia,serif" font-size="26">Tizita Major</text>
+      <text x="24.0" y="124" fill="#8C7D6C" font-family="IBM Plex Mono,monospace" font-size="12" text-anchor="start">ትዝታ</text>
+      <line x1="24" y1="158" x2="976" y2="158" stroke="#4A3F33"/>
+      <line x1="24.0" y1="150" x2="24.0" y2="166" stroke="#74B8AC" stroke-opacity="0.5" stroke-width="2"/>
+      <line x1="103.3" y1="150" x2="103.3" y2="166" stroke="#74B8AC" stroke-opacity="0.5" stroke-width="2"/>
+      <line x1="182.7" y1="150" x2="182.7" y2="166" stroke="#74B8AC" stroke-opacity="0.5" stroke-width="2"/>
+      <line x1="262.0" y1="150" x2="262.0" y2="166" stroke="#74B8AC" stroke-opacity="0.5" stroke-width="2"/>
+      <line x1="341.3" y1="150" x2="341.3" y2="166" stroke="#74B8AC" stroke-opacity="0.5" stroke-width="2"/>
+      <line x1="420.7" y1="150" x2="420.7" y2="166" stroke="#74B8AC" stroke-opacity="0.5" stroke-width="2"/>
+      <line x1="500.0" y1="150" x2="500.0" y2="166" stroke="#74B8AC" stroke-opacity="0.5" stroke-width="2"/>
+      <line x1="579.3" y1="150" x2="579.3" y2="166" stroke="#74B8AC" stroke-opacity="0.5" stroke-width="2"/>
+      <line x1="658.7" y1="150" x2="658.7" y2="166" stroke="#74B8AC" stroke-opacity="0.5" stroke-width="2"/>
+      <line x1="738.0" y1="150" x2="738.0" y2="166" stroke="#74B8AC" stroke-opacity="0.5" stroke-width="2"/>
+      <line x1="817.3" y1="150" x2="817.3" y2="166" stroke="#74B8AC" stroke-opacity="0.5" stroke-width="2"/>
+      <line x1="896.7" y1="150" x2="896.7" y2="166" stroke="#74B8AC" stroke-opacity="0.5" stroke-width="2"/>
+      <line x1="976.0" y1="150" x2="976.0" y2="166" stroke="#74B8AC" stroke-opacity="0.5" stroke-width="2"/>
+      <rect x="24.0" y="155.5" width="0.0" height="5" rx="2.5" fill="#74B8AC"/>
+      <circle cx="24.0" cy="158" r="8" fill="#E2683C" stroke="#15120E" stroke-width="3"/>
+      <text x="24.0" y="184" fill="#8C7D6C" font-family="IBM Plex Mono,monospace" font-size="12" text-anchor="middle">±0</text>
+      <rect x="247.7" y="155.5" width="14.3" height="5" rx="2.5" fill="#74B8AC"/>
+      <circle cx="247.7" cy="158" r="8" fill="#E2683C" stroke="#15120E" stroke-width="3"/>
+      <text x="247.7" y="184" fill="#74B8AC" font-family="IBM Plex Mono,monospace" font-size="12" text-anchor="middle">−18</text>
+      <rect x="330.2" y="155.5" width="11.1" height="5" rx="2.5" fill="#74B8AC"/>
+      <circle cx="330.2" cy="158" r="8" fill="#E2683C" stroke="#15120E" stroke-width="3"/>
+      <text x="330.2" y="184" fill="#8C7D6C" font-family="IBM Plex Mono,monospace" font-size="12" text-anchor="middle">−14</text>
+      <rect x="420.7" y="155.5" width="15.9" height="5" rx="2.5" fill="#74B8AC"/>
+      <circle cx="436.5" cy="158" r="8" fill="#E2683C" stroke="#15120E" stroke-width="3"/>
+      <text x="436.5" y="184" fill="#74B8AC" font-family="IBM Plex Mono,monospace" font-size="12" text-anchor="middle">+20</text>
+      <rect x="561.9" y="155.5" width="17.5" height="5" rx="2.5" fill="#74B8AC"/>
+      <circle cx="561.9" cy="158" r="8" fill="#E2683C" stroke="#15120E" stroke-width="3"/>
+      <text x="561.9" y="184" fill="#74B8AC" font-family="IBM Plex Mono,monospace" font-size="12" text-anchor="middle">−22</text>
+      <rect x="725.3" y="155.5" width="12.7" height="5" rx="2.5" fill="#74B8AC"/>
+      <circle cx="725.3" cy="158" r="8" fill="#E2683C" stroke="#15120E" stroke-width="3"/>
+      <text x="725.3" y="184" fill="#74B8AC" font-family="IBM Plex Mono,monospace" font-size="12" text-anchor="middle">−16</text>
+      <rect x="817.3" y="155.5" width="14.3" height="5" rx="2.5" fill="#74B8AC"/>
+      <circle cx="831.6" cy="158" r="8" fill="#E2683C" stroke="#15120E" stroke-width="3"/>
+      <text x="831.6" y="184" fill="#74B8AC" font-family="IBM Plex Mono,monospace" font-size="12" text-anchor="middle">+18</text>
+      <rect x="896.7" y="155.5" width="28.6" height="5" rx="2.5" fill="#74B8AC"/>
+      <circle cx="925.2" cy="158" r="8" fill="#E2683C" stroke="#15120E" stroke-width="3"/>
+      <text x="925.2" y="184" fill="#74B8AC" font-family="IBM Plex Mono,monospace" font-size="12" text-anchor="middle">+36</text>
+      <text x="0" y="210" fill="#5E8FE6" font-family="Instrument Serif,Georgia,serif" font-size="26">Ambassel</text>
+      <text x="24.0" y="210" fill="#8C7D6C" font-family="IBM Plex Mono,monospace" font-size="12" text-anchor="start">አምባሰል</text>
+      <line x1="24" y1="244" x2="976" y2="244" stroke="#4A3F33"/>
+      <line x1="24.0" y1="236" x2="24.0" y2="252" stroke="#74B8AC" stroke-opacity="0.5" stroke-width="2"/>
+      <line x1="103.3" y1="236" x2="103.3" y2="252" stroke="#74B8AC" stroke-opacity="0.5" stroke-width="2"/>
+      <line x1="182.7" y1="236" x2="182.7" y2="252" stroke="#74B8AC" stroke-opacity="0.5" stroke-width="2"/>
+      <line x1="262.0" y1="236" x2="262.0" y2="252" stroke="#74B8AC" stroke-opacity="0.5" stroke-width="2"/>
+      <line x1="341.3" y1="236" x2="341.3" y2="252" stroke="#74B8AC" stroke-opacity="0.5" stroke-width="2"/>
+      <line x1="420.7" y1="236" x2="420.7" y2="252" stroke="#74B8AC" stroke-opacity="0.5" stroke-width="2"/>
+      <line x1="500.0" y1="236" x2="500.0" y2="252" stroke="#74B8AC" stroke-opacity="0.5" stroke-width="2"/>
+      <line x1="579.3" y1="236" x2="579.3" y2="252" stroke="#74B8AC" stroke-opacity="0.5" stroke-width="2"/>
+      <line x1="658.7" y1="236" x2="658.7" y2="252" stroke="#74B8AC" stroke-opacity="0.5" stroke-width="2"/>
+      <line x1="738.0" y1="236" x2="738.0" y2="252" stroke="#74B8AC" stroke-opacity="0.5" stroke-width="2"/>
+      <line x1="817.3" y1="236" x2="817.3" y2="252" stroke="#74B8AC" stroke-opacity="0.5" stroke-width="2"/>
+      <line x1="896.7" y1="236" x2="896.7" y2="252" stroke="#74B8AC" stroke-opacity="0.5" stroke-width="2"/>
+      <line x1="976.0" y1="236" x2="976.0" y2="252" stroke="#74B8AC" stroke-opacity="0.5" stroke-width="2"/>
+      <rect x="24.0" y="241.5" width="0.0" height="5" rx="2.5" fill="#74B8AC"/>
+      <circle cx="24.0" cy="244" r="8" fill="#5E8FE6" stroke="#15120E" stroke-width="3"/>
+      <text x="24.0" y="270" fill="#8C7D6C" font-family="IBM Plex Mono,monospace" font-size="12" text-anchor="middle">±0</text>
+      <rect x="168.4" y="241.5" width="14.3" height="5" rx="2.5" fill="#74B8AC"/>
+      <circle cx="168.4" cy="244" r="8" fill="#5E8FE6" stroke="#15120E" stroke-width="3"/>
+      <text x="168.4" y="270" fill="#74B8AC" font-family="IBM Plex Mono,monospace" font-size="12" text-anchor="middle">−18</text>
+      <rect x="262.0" y="241.5" width="12.7" height="5" rx="2.5" fill="#74B8AC"/>
+      <circle cx="274.7" cy="244" r="8" fill="#5E8FE6" stroke="#15120E" stroke-width="3"/>
+      <text x="274.7" y="270" fill="#74B8AC" font-family="IBM Plex Mono,monospace" font-size="12" text-anchor="middle">+16</text>
+      <rect x="420.7" y="241.5" width="15.9" height="5" rx="2.5" fill="#74B8AC"/>
+      <circle cx="436.5" cy="244" r="8" fill="#5E8FE6" stroke="#15120E" stroke-width="3"/>
+      <text x="436.5" y="270" fill="#74B8AC" font-family="IBM Plex Mono,monospace" font-size="12" text-anchor="middle">+20</text>
+      <rect x="561.9" y="241.5" width="17.5" height="5" rx="2.5" fill="#74B8AC"/>
+      <circle cx="561.9" cy="244" r="8" fill="#5E8FE6" stroke="#15120E" stroke-width="3"/>
+      <text x="561.9" y="270" fill="#74B8AC" font-family="IBM Plex Mono,monospace" font-size="12" text-anchor="middle">−22</text>
+      <rect x="658.7" y="241.5" width="9.5" height="5" rx="2.5" fill="#74B8AC"/>
+      <circle cx="668.2" cy="244" r="8" fill="#5E8FE6" stroke="#15120E" stroke-width="3"/>
+      <text x="668.2" y="270" fill="#8C7D6C" font-family="IBM Plex Mono,monospace" font-size="12" text-anchor="middle">+12</text>
+      <rect x="817.3" y="241.5" width="14.3" height="5" rx="2.5" fill="#74B8AC"/>
+      <circle cx="831.6" cy="244" r="8" fill="#5E8FE6" stroke="#15120E" stroke-width="3"/>
+      <text x="831.6" y="270" fill="#74B8AC" font-family="IBM Plex Mono,monospace" font-size="12" text-anchor="middle">+18</text>
+      <rect x="896.7" y="241.5" width="28.6" height="5" rx="2.5" fill="#74B8AC"/>
+      <circle cx="925.2" cy="244" r="8" fill="#5E8FE6" stroke="#15120E" stroke-width="3"/>
+      <text x="925.2" y="270" fill="#74B8AC" font-family="IBM Plex Mono,monospace" font-size="12" text-anchor="middle">+36</text>
+      <text x="0" y="296" fill="#4DB38A" font-family="Instrument Serif,Georgia,serif" font-size="26">Bati</text>
+      <text x="24.0" y="296" fill="#8C7D6C" font-family="IBM Plex Mono,monospace" font-size="12" text-anchor="start">ባቲ</text>
+      <line x1="24" y1="330" x2="976" y2="330" stroke="#4A3F33"/>
+      <line x1="24.0" y1="322" x2="24.0" y2="338" stroke="#74B8AC" stroke-opacity="0.5" stroke-width="2"/>
+      <line x1="103.3" y1="322" x2="103.3" y2="338" stroke="#74B8AC" stroke-opacity="0.5" stroke-width="2"/>
+      <line x1="182.7" y1="322" x2="182.7" y2="338" stroke="#74B8AC" stroke-opacity="0.5" stroke-width="2"/>
+      <line x1="262.0" y1="322" x2="262.0" y2="338" stroke="#74B8AC" stroke-opacity="0.5" stroke-width="2"/>
+      <line x1="341.3" y1="322" x2="341.3" y2="338" stroke="#74B8AC" stroke-opacity="0.5" stroke-width="2"/>
+      <line x1="420.7" y1="322" x2="420.7" y2="338" stroke="#74B8AC" stroke-opacity="0.5" stroke-width="2"/>
+      <line x1="500.0" y1="322" x2="500.0" y2="338" stroke="#74B8AC" stroke-opacity="0.5" stroke-width="2"/>
+      <line x1="579.3" y1="322" x2="579.3" y2="338" stroke="#74B8AC" stroke-opacity="0.5" stroke-width="2"/>
+      <line x1="658.7" y1="322" x2="658.7" y2="338" stroke="#74B8AC" stroke-opacity="0.5" stroke-width="2"/>
+      <line x1="738.0" y1="322" x2="738.0" y2="338" stroke="#74B8AC" stroke-opacity="0.5" stroke-width="2"/>
+      <line x1="817.3" y1="322" x2="817.3" y2="338" stroke="#74B8AC" stroke-opacity="0.5" stroke-width="2"/>
+      <line x1="896.7" y1="322" x2="896.7" y2="338" stroke="#74B8AC" stroke-opacity="0.5" stroke-width="2"/>
+      <line x1="976.0" y1="322" x2="976.0" y2="338" stroke="#74B8AC" stroke-opacity="0.5" stroke-width="2"/>
+      <rect x="24.0" y="327.5" width="0.0" height="5" rx="2.5" fill="#74B8AC"/>
+      <circle cx="24.0" cy="330" r="8" fill="#4DB38A" stroke="#15120E" stroke-width="3"/>
+      <text x="24.0" y="356" fill="#8C7D6C" font-family="IBM Plex Mono,monospace" font-size="12" text-anchor="middle">±0</text>
+      <rect x="168.4" y="327.5" width="14.3" height="5" rx="2.5" fill="#74B8AC"/>
+      <circle cx="168.4" cy="330" r="8" fill="#4DB38A" stroke="#15120E" stroke-width="3"/>
+      <text x="168.4" y="356" fill="#74B8AC" font-family="IBM Plex Mono,monospace" font-size="12" text-anchor="middle">−18</text>
+      <rect x="262.0" y="327.5" width="12.7" height="5" rx="2.5" fill="#74B8AC"/>
+      <circle cx="274.7" cy="330" r="8" fill="#4DB38A" stroke="#15120E" stroke-width="3"/>
+      <text x="274.7" y="356" fill="#74B8AC" font-family="IBM Plex Mono,monospace" font-size="12" text-anchor="middle">+16</text>
+      <rect x="419.1" y="327.5" width="1.6" height="5" rx="2.5" fill="#74B8AC"/>
+      <circle cx="419.1" cy="330" r="8" fill="#4DB38A" stroke="#15120E" stroke-width="3"/>
+      <text x="419.1" y="356" fill="#8C7D6C" font-family="IBM Plex Mono,monospace" font-size="12" text-anchor="middle">−2</text>
+      <rect x="561.9" y="327.5" width="17.5" height="5" rx="2.5" fill="#74B8AC"/>
+      <circle cx="561.9" cy="330" r="8" fill="#4DB38A" stroke="#15120E" stroke-width="3"/>
+      <text x="561.9" y="356" fill="#74B8AC" font-family="IBM Plex Mono,monospace" font-size="12" text-anchor="middle">−22</text>
+      <rect x="725.3" y="327.5" width="12.7" height="5" rx="2.5" fill="#74B8AC"/>
+      <circle cx="725.3" cy="330" r="8" fill="#4DB38A" stroke="#15120E" stroke-width="3"/>
+      <text x="725.3" y="356" fill="#74B8AC" font-family="IBM Plex Mono,monospace" font-size="12" text-anchor="middle">−16</text>
+      <rect x="817.3" y="327.5" width="14.3" height="5" rx="2.5" fill="#74B8AC"/>
+      <circle cx="831.6" cy="330" r="8" fill="#4DB38A" stroke="#15120E" stroke-width="3"/>
+      <text x="831.6" y="356" fill="#74B8AC" font-family="IBM Plex Mono,monospace" font-size="12" text-anchor="middle">+18</text>
+      <rect x="896.7" y="327.5" width="28.6" height="5" rx="2.5" fill="#74B8AC"/>
+      <circle cx="925.2" cy="330" r="8" fill="#4DB38A" stroke="#15120E" stroke-width="3"/>
+      <text x="925.2" y="356" fill="#74B8AC" font-family="IBM Plex Mono,monospace" font-size="12" text-anchor="middle">+36</text>
+      <text x="24.0" y="380" fill="#74B8AC" font-family="IBM Plex Mono,monospace" font-size="11" text-anchor="middle">0</text>
+      <text x="182.7" y="380" fill="#74B8AC" font-family="IBM Plex Mono,monospace" font-size="11" text-anchor="middle">200</text>
+      <text x="341.3" y="380" fill="#74B8AC" font-family="IBM Plex Mono,monospace" font-size="11" text-anchor="middle">400</text>
+      <text x="500.0" y="380" fill="#74B8AC" font-family="IBM Plex Mono,monospace" font-size="11" text-anchor="middle">600</text>
+      <text x="658.7" y="380" fill="#74B8AC" font-family="IBM Plex Mono,monospace" font-size="11" text-anchor="middle">800</text>
+      <text x="817.3" y="380" fill="#74B8AC" font-family="IBM Plex Mono,monospace" font-size="11" text-anchor="middle">1000</text>
+      <text x="976.0" y="380" fill="#74B8AC" font-family="IBM Plex Mono,monospace" font-size="11" text-anchor="middle">1200</text>
+    </svg>
+    </div>
+    <div class="legend">
+      <span><i class="dot"></i>Scale degree</span>
+      <span><i class="tick"></i>Equal-tempered key</span>
+      <span><i class="bar"></i>How far it leans</span>
+    </div>
+  </section>
+
+  <section>
+    <h2>One engine, two ways to the speakers</h2>
+    <div class="grid cols-2">
+      <div class="card" style="border-top-color:var(--saffron)">
+        <div class="tag">Web</div>
+        <h3>WebAssembly + AudioWorklet</h3>
+        <p>The Rust crate is compiled with <code>wasm-bindgen</code> and played through an AudioWorklet in 128-frame blocks, 2.67 ms each at 48 kHz. An AnalyserNode feeds the on-screen scope.</p>
+      </div>
+      <div class="card" style="border-top-color:var(--green)">
+        <div class="tag">iOS</div>
+        <h3>Native framework on CoreAudio</h3>
+        <p>The same crate builds to <code>KrarEngine.xcframework</code> and renders straight into CoreAudio on its own real-time thread, driven from Dart over <code>dart:ffi</code>. The audio thread never waits on the UI.</p>
+      </div>
+    </div>
+    <ul class="facts">
+      <li>Each voice is a delay line one period long; every pass is averaged and damped, so high harmonics fade first.</li>
+      <li>Two excitations: a noise burst for the plucked lyres, and a felt-shaped hammer strike for the piano.</li>
+      <li>Fourteen voices: five begena strings, one for previewing single notes, and eight pooled piano voices.</li>
+      <li>Flutter draws every instrument on a canvas, so the same code runs on the web and on iPhone.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>On a phone</h2>
+    <div class="shots">
+      <figure>
+        <img src="img/play.png" alt="The Play page on iPhone: a tall begena with five colour-coded strings in a wooden frame, note names Db2 to F4 beneath them.">
+        <figcaption>Play · begena</figcaption>
+      </figure>
+      <figure>
+        <img src="img/piano.png" alt="The Piano page on iPhone: a keyboard with eight numbered qenet pads above it, each with a line down to where its pitch falls between the keys.">
+        <figcaption>Piano · qenet over the keys</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section>
+    <h2>Build it yourself</h2>
+    <p>Rust and <code>wasm-pack</code> for the engine, Flutter for the app. The whole web build is three commands:</p>
+<pre><code>npm run build:engine   # Rust -&gt; WebAssembly
+npm run build:web      # Flutter web, with the engine copied in
+npm run serve          # http://localhost:8080</code></pre>
+    <p>For iPhone, <code>npm run build:ios</code> compiles the engine into an xcframework and builds the app. Full instructions, the architecture and the known issues are in the <a href="https://github.com/Mattathiasa/Krar#readme">README</a>.</p>
+  </section>
+
+  <footer>
+    Built with Rust, WebAssembly, Flutter and the Web Audio API · MIT licensed ·
+    <a href="https://github.com/Mattathiasa/Krar">source on GitHub</a>
+  </footer>
+</div>
+</body>
+</html>

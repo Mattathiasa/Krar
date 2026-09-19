@@ -1,0 +1,81 @@
+name: Deploy landing page and web app
+
+# Publishes site/ to GitHub Pages, with the Flutter web app under /app.
+# Set Pages → Build and deployment → Source to "GitHub Actions" once.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust with the wasm target
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+
+      - name: Cache cargo
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            krar_engine/target
+          key: cargo-${{ runner.os }}-${{ hashFiles('krar_engine/Cargo.lock') }}
+
+      - name: Install wasm-pack
+        run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+
+      - name: Build the engine for WebAssembly
+        run: cd krar_engine && wasm-pack build --target web
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Build the Flutter web app
+        # The app is served from /<repo>/app/, so it needs a matching base href.
+        run: |
+          cd krar_flutter
+          flutter pub get
+          flutter build web --release --base-href "/${GITHUB_REPOSITORY#*/}/app/"
+
+      - name: Check the app for problems
+        run: cd krar_flutter && flutter analyze && flutter test
+
+      - name: Assemble the site
+        run: |
+          mkdir -p _site/app
+          cp -r site/. _site/
+          cp -r krar_flutter/build/web/. _site/app/
+          rm -rf _site/app/pkg
+          cp -r krar_engine/pkg _site/app/pkg
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
