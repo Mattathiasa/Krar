@@ -3,6 +3,7 @@ import '../widgets/string_canvas.dart';
 import '../widgets/scale_selector.dart';
 import '../widgets/scale_visualizer.dart';
 import '../audio/krar_engine.dart';
+import 'tab_editor_screen.dart';
 
 class StudioScreen extends StatefulWidget {
   const StudioScreen({super.key});
@@ -53,6 +54,17 @@ class _StudioScreenState extends State<StudioScreen> {
         backgroundColor: const Color(0xFF16213E),
         elevation: 0,
         actions: [
+          IconButton(
+            icon: const Icon(Icons.tab),
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => TabEditorScreen(engine: _engine),
+                ),
+              );
+            },
+            tooltip: 'Tab Editor',
+          ),
           IconButton(
             icon: const Icon(Icons.info_outline),
             onPressed: () {
