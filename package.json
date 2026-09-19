@@ -5,8 +5,9 @@
   "private": true,
   "scripts": {
     "build:engine": "cd krar_engine && wasm-pack build --target web",
-    "dev": "cd krar_flutter && flutter run -d chrome",
-    "build": "cd krar_flutter && flutter build web"
+    "build:web": "cd krar_flutter && flutter build web && cp -r ../krar_engine/pkg build/web/pkg",
+    "serve": "cd krar_flutter/build/web && python3 -m http.server 8080",
+    "dev": "cd krar_flutter && flutter run -d chrome --web-port=8080"
   },
   "keywords": ["krar", "begena", "ethiopian", "microtonal", "synthesizer", "wasm", "flutter"],
   "author": "",

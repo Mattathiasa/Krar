@@ -1,0 +1,4 @@
+krar_engine/pkg/
+krar_engine/target/
+krar_flutter/build/
+*.wasm

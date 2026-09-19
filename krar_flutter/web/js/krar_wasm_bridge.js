@@ -1,4 +1,4 @@
-import init, { KrarEngine } from '../../krar_engine/pkg/krar_engine.js';
+import init, { KrarEngine } from '../pkg/krar_engine.js';
 
 let engine = null;
 let audioContext = null;
