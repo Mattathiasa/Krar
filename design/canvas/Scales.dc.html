@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Scale comparison</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=Noto+Sans+Ethiopic:wght@400;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#15120E;font-family:'IBM Plex Sans',system-ui,sans-serif;color:#F3EADB}
+a{color:#E8B04A}a:hover{color:#F6D08A}
+button{font-family:inherit}
+button:focus-visible,a:focus-visible{outline:2px solid #F3EADB;outline-offset:2px}
+.playrow:hover{filter:brightness(1.12)}
+@keyframes kbPop{0%{opacity:0;transform:translateY(-14px) scale(.4)}70%{opacity:1;transform:translateY(2px) scale(1.15)}100%{opacity:1;transform:none}}
+@keyframes kbGrow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@media (prefers-reduced-motion: reduce){*{animation:none !important}}
+</style>
+</helmet>
+<div style="width: 1440px; height: 900px; box-sizing: border-box; background: #15120E; color: #F3EADB; display: flex; flex-direction: column;">
+
+  <header style="height: 72px; box-sizing: border-box; padding: 0 32px; display: flex; align-items: center; gap: 40px;">
+    <div style="display: flex; align-items: baseline; gap: 10px;">
+      <span style="font-family: 'Instrument Serif', Georgia, serif; font-size: 30px; line-height: 1;">Krar &amp; Begena</span>
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: #E8B04A;">Studio</span>
+    </div>
+    <nav style="display: flex; gap: 4px;" aria-label="Sections">
+      <a href="Main.dc.html" style="padding: 10px 16px; border-radius: 8px; color: #B3A391; text-decoration: none; font-size: 14px;">Play</a>
+      <a href="Piano.dc.html" style="padding: 10px 16px; border-radius: 8px; color: #B3A391; text-decoration: none; font-size: 14px;">Piano</a>
+      <a href="Scales.dc.html" style="padding: 10px 16px; border-radius: 8px; background: #2B241C; color: #F3EADB; text-decoration: none; font-size: 14px; font-weight: 500;">Scales</a>
+      <a href="Tutor.dc.html" style="padding: 10px 16px; border-radius: 8px; color: #B3A391; text-decoration: none; font-size: 14px;">Tab Tutor</a>
+      <a href="Engine.dc.html" style="padding: 10px 16px; border-radius: 8px; color: #B3A391; text-decoration: none; font-size: 14px;">Engine</a>
+    </nav>
+  </header>
+
+  <svg width="1440" height="10" aria-hidden="true" style="display: block; flex-shrink: 0;">
+    <defs>
+      <pattern id="tibeb" width="60" height="10" patternUnits="userSpaceOnUse">
+        <rect width="60" height="10" fill="#1F1A15"></rect>
+        <path d="M0 5 L7.5 0 L15 5 L7.5 10Z" fill="#E8B04A"></path>
+        <path d="M15 5 L22.5 0 L30 5 L22.5 10Z" fill="#4DB38A"></path>
+        <path d="M30 5 L37.5 0 L45 5 L37.5 10Z" fill="#E2683C"></path>
+        <path d="M45 5 L52.5 0 L60 5 L52.5 10Z" fill="#5E8FE6"></path>
+      </pattern>
+    </defs>
+    <rect width="1440" height="10" fill="url(#tibeb)"></rect>
+  </svg>
+
+  <div style="padding: 30px 48px 0; display: flex; justify-content: space-between; align-items: flex-end;">
+    <div>
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: #B3A391;">The four qenet · <span style="font-family: 'Noto Sans Ethiopic', sans-serif; letter-spacing: 0; color: #E8B04A;">ቅኝት</span></div>
+      <h1 style="margin: 8px 0 0; font-family: 'Instrument Serif', Georgia, serif; font-weight: 400; font-size: 60px; line-height: 1;">Between the <span style="font-style: italic; color: #E8B04A;">piano keys</span></h1>
+      <p style="margin: 12px 0 0; max-width: 680px; font-size: 16px; line-height: 1.5; color: #B3A391;">Each dot is a scale degree, placed in cents from the root. Teal ticks are the piano's equal temperament; the teal bar shows which way, and how far, the Ethiopian pitch leans. Press play to hear it.</p>
+    </div>
+    <div style="display: flex; gap: 24px; font-size: 13px; color: #B3A391;">
+      <div style="display: flex; align-items: center; gap: 8px;"><span style="width: 12px; height: 12px; border-radius: 50%; background: #E8B04A;"></span>Scale degree</div>
+      <div style="display: flex; align-items: center; gap: 8px;"><span style="width: 2px; height: 14px; background: #74B8AC;"></span>12-TET key</div>
+      <div style="display: flex; align-items: center; gap: 8px;"><span style="width: 18px; height: 4px; border-radius: 2px; background: #74B8AC;"></span>Lean</div>
+    </div>
+  </div>
+
+  <div style="flex-grow: 1; padding: 24px 48px 36px; display: flex; flex-direction: column; gap: 12px;">
+    <sc-for list="{{rows}}" as="r" hint-placeholder-count="4">
+      <div style="flex-grow: 1; display: flex; align-items: center; gap: 24px; padding: 0 24px; border-radius: 16px; background: #1F1A15; transition: border-color 200ms, background 200ms; border: 1px solid {{r.border}};">
+        <button type="button" class="playrow" onClick="{{r.play}}" aria-label="{{r.aria}}" style="width: 52px; height: 52px; flex-shrink: 0; border-radius: 50%; border: 0; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #15120E; background: {{r.hue}};">
+          <sc-if value="{{r.isPlaying}}" hint-placeholder-val="{{false}}">
+            <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><rect x="3" y="3" width="10" height="10" rx="2" fill="currentColor"></rect></svg>
+          </sc-if>
+          <sc-if value="{{r.idle}}" hint-placeholder-val="{{true}}">
+            <svg width="18" height="18" viewBox="0 0 16 16" aria-hidden="true"><path d="M4.5 2.5v11l9-5.5z" fill="currentColor"></path></svg>
+          </sc-if>
+        </button>
+        <div style="width: 150px; flex-shrink: 0;">
+          <div style="font-family: 'Instrument Serif', Georgia, serif; font-size: 32px; line-height: 1.05; color: {{r.hue}};">{{r.name}}</div>
+          <div style="margin-top: 4px; font-size: 13px; color: #B3A391;"><span style="font-family: 'Noto Sans Ethiopic', sans-serif; color: #F3EADB;">{{r.geez}}</span> · {{r.description}}</div>
+        </div>
+        <div style="position: relative; width: 1040px; height: 112px; flex-shrink: 0;">
+          <div style="position: absolute; left: 0; right: 0; top: 56px; height: 1px; background: #4A3F33;"></div>
+          <sc-for list="{{ticks}}" as="t" hint-placeholder-count="13">
+            <div style="position: absolute; top: 44px; width: 2px; height: 24px; margin-left: -1px; background: #74B8AC; opacity: 0.5; left: {{t.left}};"></div>
+          </sc-for>
+          <sc-for list="{{r.dots}}" as="d" hint-placeholder-count="8">
+            <div style="position: absolute; top: 54px; height: 5px; border-radius: 3px; background: #74B8AC; transform-origin: {{d.leanOrigin}}; left: {{d.leanLeft}}; width: {{d.leanW}}; animation: {{d.leanAnim}};"></div>
+          </sc-for>
+          <sc-for list="{{r.dots}}" as="d" hint-placeholder-count="8">
+            <div style="position: absolute; top: 0; width: 60px; margin-left: -30px; height: 112px; display: flex; flex-direction: column; align-items: center; left: {{d.left}}; animation: {{d.anim}};">
+              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; height: 36px; line-height: 36px; color: {{d.textColor}};">{{d.cents}}</span>
+              <span style="border-radius: 50%; border: 3px solid #1F1A15; margin-top: 1px; transition: all 160ms; width: 16px; height: 16px; transform: {{d.size}}; background: {{r.hue}}; box-shadow: {{d.glow}};"></span>
+              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; margin-top: 8px; color: {{d.devColor}};">{{d.dev}}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </sc-for>
+    <div style="position: relative; margin-left: 275px; width: 1040px; height: 20px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #74B8AC;">
+      <sc-for list="{{ticks}}" as="t" hint-placeholder-count="13">
+        <span style="position: absolute; width: 40px; margin-left: -20px; text-align: center; left: {{t.left}};">{{t.label}}</span>
+      </sc-for>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"motion":{"editor":"boolean","default":true},"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { row: -1, step: -1 };
+  }
+  componentWillUnmount() { clearInterval(this.iv); }
+  audio() {
+    if (!this.ctx) {
+      var AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return null;
+      this.ctx = new AC();
+    }
+    if (this.ctx.state === 'suspended') this.ctx.resume();
+    return this.ctx;
+  }
+  karplus(freq, level) {
+    var ctx = this.audio();
+    if (!ctx) return;
+    var sr = ctx.sampleRate, len = Math.floor(sr * 1.8);
+    var buf = ctx.createBuffer(1, len, sr), out = buf.getChannelData(0);
+    var N = Math.max(2, Math.round(sr / freq)), line = new Float32Array(N), p = 0, n;
+    for (n = 0; n < N; n++) line[n] = Math.random() * 2 - 1;
+    for (n = 0; n < len; n++) {
+      var a = line[p], b = line[(p + 1) % N];
+      line[p] = 0.995 * 0.5 * (a + b);
+      out[n] = a;
+      p = (p + 1) % N;
+    }
+    var fade = Math.floor(sr * 0.08);
+    for (n = 0; n < fade; n++) out[len - 1 - n] *= n / fade;
+    var src = ctx.createBufferSource(), g = ctx.createGain();
+    src.buffer = buf; g.gain.value = level;
+    src.connect(g); g.connect(ctx.destination); src.start();
+  }
+  playRow(ri, cents) {
+    var self = this;
+    clearInterval(this.iv);
+    if (this.state.row === ri) { this.setState({ row: -1, step: -1 }); return; }
+    var step = 0;
+    var tick = function () {
+      if (step >= cents.length) { clearInterval(self.iv); self.setState({ row: -1, step: -1 }); return; }
+      self.karplus(207.7 * Math.pow(2, cents[step] / 1200), 0.35);
+      self.setState({ row: ri, step: step });
+      step++;
+    };
+    tick();
+    this.iv = setInterval(tick, 380);
+  }
+  renderVals() {
+    var self = this;
+    var motion = this.props.motion ?? true;
+    try { if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) motion = false; } catch (e) {}
+    var W = 1040, pad = 20, span = W - pad * 2;
+    function px(c) { return pad + c / 1200 * span; }
+    var data = [
+      { name: 'Tizita Minor', geez: 'ትዝታ', hue: '#E8B04A', description: 'Minor character', cents: [0, 282, 386, 520, 678, 884, 1018, 1136] },
+      { name: 'Tizita Major', geez: 'ትዝታ', hue: '#E2683C', description: 'Major variant', cents: [0, 282, 386, 520, 678, 884, 1018, 1136] },
+      { name: 'Ambassel', geez: 'አምባሰል', hue: '#5E8FE6', description: 'Melancholic', cents: [0, 182, 316, 520, 678, 812, 1018, 1136] },
+      { name: 'Bati', geez: 'ባቲ', hue: '#4DB38A', description: 'Bright', cents: [0, 182, 316, 498, 678, 884, 1018, 1136] }
+    ];
+    var rows = data.map(function (s, ri) {
+      var playing = self.state.row === ri;
+      return {
+        name: s.name, geez: s.geez, hue: s.hue, description: s.description,
+        aria: (playing ? 'Stop ' : 'Play ') + s.name,
+        isPlaying: playing, idle: !playing,
+        border: playing ? s.hue : '#3B3229',
+        play: function () { self.playRow(ri, s.cents); },
+        dots: s.cents.map(function (c, di) {
+          var et = Math.round(c / 100) * 100;
+          var dev = Math.round(c - et);
+          var a = px(et), b = px(c);
+          var on = playing && self.state.step === di;
+          var delay = (ri * 0.12 + di * 0.06).toFixed(2);
+          return {
+            left: b.toFixed(1) + 'px', cents: String(c),
+            leanLeft: Math.min(a, b).toFixed(1) + 'px', leanW: Math.abs(b - a).toFixed(1) + 'px',
+            leanOrigin: dev < 0 ? 'right' : 'left',
+            leanAnim: motion ? 'kbGrow 600ms cubic-bezier(.2,.8,.2,1) ' + (Number(delay) + 0.4).toFixed(2) + 's both' : 'none',
+            anim: motion ? 'kbPop 520ms cubic-bezier(.2,.8,.2,1) ' + delay + 's both' : 'none',
+            size: on ? 'scale(1.6)' : 'none', glow: on ? '0 0 18px ' + s.hue : 'none',
+            textColor: on ? s.hue : '#F3EADB',
+            dev: dev === 0 ? '±0' : (dev > 0 ? '+' + dev : '−' + Math.abs(dev)),
+            devColor: Math.abs(dev) >= 15 ? '#74B8AC' : '#8C7D6C'
+          };
+        })
+      };
+    });
+    var ticks = [];
+    for (var i = 0; i <= 12; i++) ticks.push({ left: px(i * 100).toFixed(1) + 'px', label: String(i * 100) });
+    return { rows: rows, ticks: ticks };
+  }
+}
+</script>
+</body>
+</html>

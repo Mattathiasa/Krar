@@ -1,0 +1,96 @@
+{
+  "v": 3,
+  "attachments": {},
+  "boards": {
+    "Engine.dc.html": {
+      "h": 900,
+      "title": "Engine \u00b7 how the sound is made",
+      "w": 1440,
+      "x": 470,
+      "y": 1020
+    },
+    "Main.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "title": "Studio \u00b7 Begena (desktop)",
+      "w": 1440,
+      "x": 0,
+      "y": 0
+    },
+    "Mobile.dc.html": {
+      "h": 844,
+      "title": "Studio \u00b7 phone",
+      "w": 390,
+      "x": 0,
+      "y": 1020
+    },
+    "Scales.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "title": "Scales \u00b7 qenet vs 12-TET",
+      "w": 1440,
+      "x": 1520,
+      "y": 0
+    },
+    "Tutor.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "title": "Tab Tutor \u00b7 Krar",
+      "w": 1440,
+      "x": 3040,
+      "y": 0
+    },
+    "Piano.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "title": "Piano \u00b7 qenet between the keys",
+      "w": 1440,
+      "x": 4560,
+      "y": 0
+    }
+  },
+  "createdOnFiles": {
+    "at": "2026-09-19T12:00:00Z",
+    "v": 1
+  },
+  "designSystems": [],
+  "launch": {
+    "view": "canvas"
+  },
+  "notes": {
+    "title": {
+      "kind": "title1",
+      "maxW": 6000,
+      "text": "Krar & Begena Studio \u2014 microtonal synth & tab tutor",
+      "w": 240,
+      "x": 0,
+      "y": -300
+    },
+    "tizitaMajor": {
+      "color": "orange",
+      "maxH": 260,
+      "text": "Data check: Tizita Major uses the exact same cent table as Tizita Minor in scale.rs and scale.dart, so the Scales board shows two identical rows. It needs its own values before this comparison means anything.",
+      "w": 420,
+      "x": 1990,
+      "y": 1020
+    },
+    "worklet": {
+      "color": "blue",
+      "maxH": 300,
+      "text": "Engine board shows the target architecture. Today audio_processor.js posts 'getBuffer' to the main thread on every block and the WASM engine runs there, so a busy UI can still glitch audio. To match the pitch, instantiate KrarEngine inside the worklet (send the compiled WebAssembly.Module over the port) and keep only pluck/scale messages on the main thread.",
+      "w": 420,
+      "x": 1990,
+      "y": 1320
+    }
+  },
+  "order": [
+    "Main.dc.html",
+    "Scales.dc.html",
+    "Tutor.dc.html",
+    "Mobile.dc.html",
+    "Engine.dc.html",
+    "Piano.dc.html"
+  ],
+  "pages": [],
+  "title": "Krar & Begena Studio"
+}

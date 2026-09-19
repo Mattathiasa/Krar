@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Tab Tutor — Krar</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=Noto+Sans+Ethiopic:wght@400;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#15120E;font-family:'IBM Plex Sans',system-ui,sans-serif;color:#F3EADB}
+a{color:#E8B04A}a:hover{color:#F6D08A}
+input[type=checkbox]{accent-color:#E8B04A}
+button{font-family:inherit}
+button:focus-visible,a:focus-visible{outline:2px solid #F3EADB;outline-offset:2px}
+.ghost:hover{background:#2B241C !important}
+.primary:hover{background:#F6D08A !important}
+@keyframes kbRing{0%{box-shadow:0 0 0 0 rgba(21,18,14,.35)}100%{box-shadow:0 0 0 14px rgba(21,18,14,0)}}
+@media (prefers-reduced-motion: reduce){*{animation:none !important;transition:none !important}}
+</style>
+</helmet>
+<div style="width: 1440px; height: 900px; box-sizing: border-box; background: #15120E; color: #F3EADB; display: flex; flex-direction: column;">
+
+  <header style="height: 72px; box-sizing: border-box; padding: 0 32px; display: flex; align-items: center; gap: 40px;">
+    <div style="display: flex; align-items: baseline; gap: 10px;">
+      <span style="font-family: 'Instrument Serif', Georgia, serif; font-size: 30px; line-height: 1;">Krar &amp; Begena</span>
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: #E8B04A;">Studio</span>
+    </div>
+    <nav style="display: flex; gap: 4px;" aria-label="Sections">
+      <a href="Main.dc.html" style="padding: 10px 16px; border-radius: 8px; color: #B3A391; text-decoration: none; font-size: 14px;">Play</a>
+      <a href="Piano.dc.html" style="padding: 10px 16px; border-radius: 8px; color: #B3A391; text-decoration: none; font-size: 14px;">Piano</a>
+      <a href="Scales.dc.html" style="padding: 10px 16px; border-radius: 8px; color: #B3A391; text-decoration: none; font-size: 14px;">Scales</a>
+      <a href="Tutor.dc.html" style="padding: 10px 16px; border-radius: 8px; background: #2B241C; color: #F3EADB; text-decoration: none; font-size: 14px; font-weight: 500;">Tab Tutor</a>
+      <a href="Engine.dc.html" style="padding: 10px 16px; border-radius: 8px; color: #B3A391; text-decoration: none; font-size: 14px;">Engine</a>
+    </nav>
+    <div style="flex-grow: 1;"></div>
+    <div role="group" aria-label="Instrument" style="display: flex; padding: 4px; gap: 4px; background: #1F1A15; border: 1px solid #3B3229; border-radius: 10px;">
+      <button type="button" aria-pressed="false" style="height: 36px; padding: 0 14px; border: 0; border-radius: 7px; background: transparent; color: #B3A391; font-size: 13px;">Begena · 5</button>
+      <button type="button" aria-pressed="true" style="height: 36px; padding: 0 14px; border: 0; border-radius: 7px; background: #E8B04A; color: #15120E; font-size: 13px; font-weight: 600;">Krar · 6</button>
+    </div>
+  </header>
+
+  <svg width="1440" height="10" aria-hidden="true" style="display: block; flex-shrink: 0;">
+    <defs>
+      <pattern id="tibeb" width="60" height="10" patternUnits="userSpaceOnUse">
+        <rect width="60" height="10" fill="#1F1A15"></rect>
+        <path d="M0 5 L7.5 0 L15 5 L7.5 10Z" fill="#E8B04A"></path>
+        <path d="M15 5 L22.5 0 L30 5 L22.5 10Z" fill="#4DB38A"></path>
+        <path d="M30 5 L37.5 0 L45 5 L37.5 10Z" fill="#E2683C"></path>
+        <path d="M45 5 L52.5 0 L60 5 L52.5 10Z" fill="#5E8FE6"></path>
+      </pattern>
+    </defs>
+    <rect width="1440" height="10" fill="url(#tibeb)"></rect>
+  </svg>
+
+  <div style="flex-grow: 1; display: flex; min-height: 0;">
+    <main style="flex-grow: 1; padding: 28px 40px; display: flex; flex-direction: column; gap: 22px; min-width: 0;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-end;">
+        <div>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: #B3A391;">Lesson [N] · <span style="color: #E8B04A;">Tizita Minor</span> <span style="font-family: 'Noto Sans Ethiopic', sans-serif; letter-spacing: 0; text-transform: none; color: #E8B04A;">ትዝታ</span></div>
+          <h1 style="margin: 8px 0 0; font-family: 'Instrument Serif', Georgia, serif; font-weight: 400; font-size: 52px; line-height: 1;">[Lesson title]</h1>
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <button type="button" class="ghost" style="height: 44px; padding: 0 18px; border-radius: 10px; border: 1px solid #3B3229; background: #1F1A15; color: #F3EADB; font-size: 14px; cursor: pointer;">Edit tab</button>
+          <button type="button" class="ghost" style="height: 44px; padding: 0 18px; border-radius: 10px; border: 1px solid #3B3229; background: #1F1A15; color: #F3EADB; font-size: 14px; cursor: pointer;">Export MusicXML</button>
+        </div>
+      </div>
+
+      <section aria-label="Tablature" style="position: relative; border-radius: 20px; background: #F3EADB; color: #15120E; padding: 34px 40px 26px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 20px 60px rgba(0,0,0,0.35);">
+        <div style="display: flex; justify-content: space-between; font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #5C4F42;">
+          <span>6-string krar tab · lines = strings, top = string 1</span>
+          <span>♩ = {{bpm}} · 4/4 · beat <strong style="color: #15120E;">{{beat}}</strong></span>
+        </div>
+        <div style="position: relative; height: 250px;">
+          <sc-for list="{{lines}}" as="l" hint-placeholder-count="6">
+            <div style="position: absolute; left: 40px; right: 0; height: 2px; margin-top: -1px; border-radius: 1px; top: {{l.top}}; background: {{l.color}}; opacity: {{l.op}};"></div>
+            <span style="position: absolute; left: 0; width: 28px; text-align: right; font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 500; margin-top: -8px; color: #5C4F42; top: {{l.top}};">{{l.label}}</span>
+          </sc-for>
+          <div style="position: absolute; top: 20px; height: 180px; width: 2px; background: #15120E; left: 40px;"></div>
+          <div style="position: absolute; top: 20px; height: 180px; width: 2px; background: #15120E; left: 480px;"></div>
+          <div style="position: absolute; top: 20px; height: 180px; width: 4px; background: #15120E; right: 0;"></div>
+          <div style="position: absolute; top: 4px; height: 220px; left: 42px; width: 438px; background: #E8B04A; border-radius: 6px; transition: opacity 300ms; opacity: {{loopOp}};"></div>
+          <span style="position: absolute; top: -18px; left: 48px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #7A4E0E; opacity: {{loopLabelOp}};">LOOP · bar 1</span>
+          <div style="position: absolute; top: -8px; height: 240px; width: 3px; margin-left: -1px; border-radius: 2px; background: #15120E; transition: {{headTransition}}; left: {{headLeft}};"></div>
+          <div style="position: absolute; top: -16px; width: 13px; height: 13px; margin-left: -6px; border-radius: 50%; background: #15120E; transition: {{headTransition}}; left: {{headLeft}};"></div>
+          <sc-for list="{{notes}}" as="n" hint-placeholder-count="16">
+            <div style="position: absolute; width: 30px; height: 30px; margin: -15px 0 0 -15px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; transition: transform 160ms, background 160ms; left: {{n.left}}; top: {{n.top}}; background: {{n.bg}}; color: {{n.fg}}; border: 2px solid {{n.border}}; transform: {{n.scale}}; opacity: {{n.op}}; animation: {{n.anim}};">{{n.label}}</div>
+            <div style="position: absolute; top: 212px; width: 2px; height: 26px; background: #15120E; margin-left: -1px; left: {{n.left}};"></div>
+          </sc-for>
+          <sc-for list="{{beams}}" as="b" hint-placeholder-count="8">
+            <div style="position: absolute; top: 236px; height: 3px; background: #15120E; left: {{b.left}}; width: {{b.width}};"></div>
+          </sc-for>
+        </div>
+      </section>
+
+      <section aria-label="Timing of last take" style="border-radius: 16px; background: #1F1A15; border: 1px solid #3B3229; padding: 18px 24px; display: flex; flex-direction: column; gap: 12px;">
+        <div style="display: flex; justify-content: space-between; align-items: baseline;">
+          <h2 style="margin: 0; font-family: 'IBM Plex Mono', monospace; font-weight: 500; font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: #B3A391;">Timing · last take</h2>
+          <div style="display: flex; gap: 20px; font-size: 13px; color: #B3A391;">
+            <span>Above line = early</span><span style="color: #4DB38A;">Band = on time</span><span>Below = late</span>
+          </div>
+        </div>
+        <div style="position: relative; height: 64px;">
+          <div style="position: absolute; left: 0; right: 0; top: 20px; height: 24px; background: #1E3328; border-radius: 6px;"></div>
+          <div style="position: absolute; left: 0; right: 0; top: 32px; height: 1px; background: #4DB38A; opacity: 0.6;"></div>
+          <sc-for list="{{timing}}" as="t" hint-placeholder-count="5">
+            <div style="position: absolute; width: 12px; height: 12px; margin: -6px 0 0 -6px; border-radius: 50%; left: {{t.left}}; top: {{t.top}}; background: {{t.color}}; box-shadow: 0 0 10px {{t.color}};"></div>
+          </sc-for>
+        </div>
+      </section>
+    </main>
+
+    <aside style="width: 360px; box-sizing: border-box; border-left: 1px solid #3B3229; padding: 28px; display: flex; flex-direction: column; gap: 26px; background: #1A1511;">
+      <div style="display: flex; gap: 10px;">
+        <button type="button" class="primary" onClick="{{togglePlay}}" style="flex-grow: 1; height: 56px; border: 0; border-radius: 12px; background: #E8B04A; color: #15120E; font-size: 16px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer;">
+          <sc-if value="{{showPause}}" hint-placeholder-val="{{false}}">
+            <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><rect x="3" y="2.5" width="3.5" height="11" rx="1" fill="currentColor"></rect><rect x="9.5" y="2.5" width="3.5" height="11" rx="1" fill="currentColor"></rect></svg>
+          </sc-if>
+          <sc-if value="{{showPlay}}" hint-placeholder-val="{{true}}">
+            <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2.5v11l9-5.5z" fill="currentColor"></path></svg>
+          </sc-if>
+          {{playLabel}}
+        </button>
+        <button type="button" class="ghost" onClick="{{restart}}" aria-label="Restart from bar 1" style="width: 56px; height: 56px; border-radius: 12px; border: 1px solid #3B3229; background: #221C16; color: #F3EADB; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10a6 6 0 1 0 2-4.5"></path><path d="M4 3v3.5h3.5"></path></svg>
+        </button>
+      </div>
+
+      <section style="display: flex; flex-direction: column; gap: 12px;">
+        <h2 style="margin: 0; font-family: 'IBM Plex Mono', monospace; font-weight: 500; font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: #B3A391;">Tempo</h2>
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <button type="button" class="ghost" onClick="{{slower}}" aria-label="Slower" style="width: 44px; height: 44px; border-radius: 10px; border: 1px solid #3B3229; background: #221C16; color: #F3EADB; font-size: 20px; cursor: pointer;">−</button>
+          <div style="flex-grow: 1; text-align: center; font-family: 'IBM Plex Mono', monospace; font-size: 30px;">{{bpm}} <span style="font-size: 14px; color: #B3A391;">BPM</span></div>
+          <button type="button" class="ghost" onClick="{{faster}}" aria-label="Faster" style="width: 44px; height: 44px; border-radius: 10px; border: 1px solid #3B3229; background: #221C16; color: #F3EADB; font-size: 20px; cursor: pointer;">+</button>
+        </div>
+        <div style="display: flex; gap: 6px;">
+          <sc-for list="{{beats}}" as="b" hint-placeholder-count="4">
+            <span style="flex-grow: 1; height: 6px; border-radius: 3px; transition: background 120ms; background: {{b.bg}};"></span>
+          </sc-for>
+        </div>
+      </section>
+
+      <section style="display: flex; flex-direction: column; gap: 4px;">
+        <label style="display: flex; align-items: center; gap: 12px; min-height: 44px; font-size: 15px;"><input type="checkbox" checked style="width: 18px; height: 18px; margin: 0;">Wait for me <span style="color: #8C7D6C; font-size: 13px;">pauses until you pluck</span></label>
+        <label style="display: flex; align-items: center; gap: 12px; min-height: 44px; font-size: 15px;"><input type="checkbox" checked="{{loop}}" onChange="{{toggleLoop}}" style="width: 18px; height: 18px; margin: 0;">Loop bar 1</label>
+        <label style="display: flex; align-items: center; gap: 12px; min-height: 44px; font-size: 15px;"><input type="checkbox" style="width: 18px; height: 18px; margin: 0;">Metronome click</label>
+      </section>
+
+      <section style="display: flex; flex-direction: column; gap: 14px; padding: 20px; border-radius: 16px; background: #221C16; transition: border-color 160ms; border: 1px solid {{cur.color}};">
+        <h2 style="margin: 0; font-family: 'IBM Plex Mono', monospace; font-weight: 500; font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: #B3A391;">Pluck now</h2>
+        <div style="display: flex; align-items: center; gap: 18px;">
+          <svg width="150" height="120" viewBox="0 0 150 120" aria-hidden="true">
+            <path d="M22 12 L14 100 L136 100 L128 12" fill="none" stroke="#6B5140" stroke-width="5" stroke-linecap="round"></path>
+            <rect x="10" y="6" width="130" height="10" rx="5" fill="#8A6A4A"></rect>
+            <line x1="35" y1="16" x2="35" y2="92" stroke="{{m0.color}}" stroke-width="{{m0.w}}" opacity="{{m0.op}}"></line>
+            <line x1="51" y1="16" x2="51" y2="92" stroke="{{m1.color}}" stroke-width="{{m1.w}}" opacity="{{m1.op}}"></line>
+            <line x1="67" y1="16" x2="67" y2="92" stroke="{{m2.color}}" stroke-width="{{m2.w}}" opacity="{{m2.op}}"></line>
+            <line x1="83" y1="16" x2="83" y2="92" stroke="{{m3.color}}" stroke-width="{{m3.w}}" opacity="{{m3.op}}"></line>
+            <line x1="99" y1="16" x2="99" y2="92" stroke="{{m4.color}}" stroke-width="{{m4.w}}" opacity="{{m4.op}}"></line>
+            <line x1="115" y1="16" x2="115" y2="92" stroke="{{m5.color}}" stroke-width="{{m5.w}}" opacity="{{m5.op}}"></line>
+          </svg>
+          <div>
+            <div style="font-family: 'Instrument Serif', Georgia, serif; font-size: 44px; line-height: 1; color: {{cur.color}};">String {{cur.n}}</div>
+            <div style="margin-top: 6px; font-size: 13px; color: #B3A391;">Next: string {{nxt.n}}</div>
+          </div>
+        </div>
+      </section>
+    </aside>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"motion":{"editor":"boolean","default":true},"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { step: 5, playing: true, sound: false, bpm: 72, loop: true };
+  }
+  componentDidMount() { this.schedule(); }
+  componentWillUnmount() { clearInterval(this.iv); }
+  isMotion() {
+    var m = this.props.motion ?? true;
+    try { if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) m = false; } catch (e) {}
+    return m;
+  }
+  schedule() {
+    var self = this;
+    clearInterval(this.iv);
+    if (!this.state.playing || (!this.isMotion() && !this.state.sound)) return;
+    this.iv = setInterval(function () { self.advance(); }, 60000 / this.state.bpm / 2);
+  }
+  advance() {
+    var end = this.state.loop ? 8 : 16;
+    var next = (this.state.step + 1) % end;
+    if (this.state.sound) this.karplus(this.freq(this.seq[next]), 0.35);
+    this.setState({ step: next });
+  }
+  freq(s) { return 196 * Math.pow(2, [0, 282, 386, 520, 678, 884][s] / 1200); }
+  audio() {
+    if (!this.ctx) {
+      var AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return null;
+      this.ctx = new AC();
+    }
+    if (this.ctx.state === 'suspended') this.ctx.resume();
+    return this.ctx;
+  }
+  karplus(freq, level) {
+    var ctx = this.audio();
+    if (!ctx) return;
+    var sr = ctx.sampleRate, len = Math.floor(sr * 1.6);
+    var buf = ctx.createBuffer(1, len, sr), out = buf.getChannelData(0);
+    var N = Math.max(2, Math.round(sr / freq)), line = new Float32Array(N), p = 0, n;
+    for (n = 0; n < N; n++) line[n] = Math.random() * 2 - 1;
+    for (n = 0; n < len; n++) {
+      var a = line[p], b = line[(p + 1) % N];
+      line[p] = 0.995 * 0.5 * (a + b);
+      out[n] = a;
+      p = (p + 1) % N;
+    }
+    var fade = Math.floor(sr * 0.08);
+    for (n = 0; n < fade; n++) out[len - 1 - n] *= n / fade;
+    var src = ctx.createBufferSource(), g = ctx.createGain();
+    src.buffer = buf; g.gain.value = level;
+    src.connect(g); g.connect(ctx.destination); src.start();
+  }
+  renderVals() {
+    var self = this;
+    var motion = this.isMotion();
+    var C = ['#E8B04A', '#E2683C', '#D94F7A', '#A77BDB', '#4DB38A', '#5E8FE6'];
+    var seq = this.seq = [1, 3, 2, 4, 3, 5, 4, 2, 0, 2, 1, 3, 2, 4, 5, 3];
+    var step = this.state.step;
+    var cs = seq[step], ns = seq[(step + 1) % (this.state.loop ? 8 : 16)];
+    var lineTop = function (s) { return (30 + s * 32) + 'px'; };
+    var lines = [];
+    for (var s = 0; s < 6; s++) lines.push({ top: lineTop(s), label: String(s + 1), color: C[s], op: s === cs ? 1 : 0.45 });
+    var X = function (i) { return 90 + i * 52; };
+    var notes = seq.map(function (s, i) {
+      var st = i < step ? 'done' : (i === step ? 'now' : 'next');
+      return {
+        left: X(i) + 'px', top: lineTop(s), label: String(s + 1),
+        bg: st === 'now' ? C[s] : '#F3EADB',
+        fg: st === 'done' ? '#8F7F6E' : '#15120E',
+        border: st === 'done' ? '#C9B9A2' : C[s],
+        op: 1,
+        scale: st === 'now' ? 'scale(1.3)' : 'none',
+        anim: st === 'now' && motion ? 'kbRing 600ms ease-out infinite' : 'none'
+      };
+    });
+    var beams = [];
+    for (var b = 0; b < 8; b++) beams.push({ left: (89 + b * 104) + 'px', width: '54px' });
+    var offs = [-6, 12, 22, -18, 4];
+    var timing = offs.map(function (o, i) {
+      return { left: (2 + i * 6.8) + '%', top: (32 + o) + 'px', color: Math.abs(o) <= 15 ? '#4DB38A' : '#E8B04A' };
+    });
+    var beatIdx = Math.floor((step % 8) / 2);
+    var beats = [0, 1, 2, 3].map(function (i) { return { bg: i === beatIdx ? '#E8B04A' : '#3B3229' }; });
+    var mini = {};
+    for (var k = 0; k < 6; k++) mini['m' + k] = { color: k === cs ? C[k] : '#8C7D6C', w: k === cs ? 4 : 1.6, op: k === cs ? 1 : 0.7 };
+    var playingAudible = this.state.playing && this.state.sound;
+    var ms = 60000 / this.state.bpm / 2;
+    var wrapped = step === 0;
+    return Object.assign({
+      lines: lines, notes: notes, beams: beams, timing: timing, beats: beats,
+      bpm: String(this.state.bpm), beat: String(beatIdx + 1),
+      headLeft: (X(step) - 26) + 'px',
+      headTransition: wrapped || !motion ? 'none' : 'left ' + Math.round(ms) + 'ms linear',
+      loop: this.state.loop, loopOp: this.state.loop ? 0.16 : 0, loopLabelOp: this.state.loop ? 1 : 0,
+      cur: { n: String(cs + 1), color: C[cs] }, nxt: { n: String(ns + 1) },
+      showPause: playingAudible, showPlay: !playingAudible,
+      playLabel: playingAudible ? 'Pause' : 'Play along',
+      togglePlay: function () {
+        if (playingAudible) self.setState({ playing: false }, function () { self.schedule(); });
+        else { self.audio(); self.setState({ playing: true, sound: true }, function () { self.schedule(); }); }
+      },
+      restart: function () { self.setState({ step: 0 }); },
+      slower: function () { self.setState({ bpm: Math.max(40, self.state.bpm - 4) }, function () { self.schedule(); }); },
+      faster: function () { self.setState({ bpm: Math.min(160, self.state.bpm + 4) }, function () { self.schedule(); }); },
+      toggleLoop: function () { self.setState({ loop: !self.state.loop, step: self.state.step % 8 }); }
+    }, mini);
+  }
+}
+</script>
+</body>
+</html>

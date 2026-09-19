@@ -1,0 +1,387 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Studio — Begena</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=Noto+Sans+Ethiopic:wght@400;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#15120E;font-family:'IBM Plex Sans',system-ui,sans-serif;color:#F3EADB}
+a{color:#E8B04A}a:hover{color:#F6D08A}
+input[type=range]{accent-color:#E8B04A}
+input[type=checkbox]{accent-color:#E8B04A}
+button{font-family:inherit}
+button:focus-visible,a:focus-visible{outline:2px solid #F3EADB;outline-offset:2px}
+.strum:hover{background:#F6D08A !important}
+.pluck{background:transparent;border:0;cursor:pointer;border-radius:40px}
+.pluck:hover{background:rgba(243,234,219,0.05)}
+.deg:hover{border-color:#8C7D6C !important}
+@keyframes kbPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.7)}}
+@keyframes kbScroll{from{transform:translateX(0)}to{transform:translateX(-400px)}}
+@keyframes kbBreathe{0%,100%{transform:scaleY(1)}50%{transform:scaleY(.62)}}
+@keyframes kbRise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion: reduce){*{animation:none !important}}
+</style>
+</helmet>
+<div style="width: 1440px; height: 900px; box-sizing: border-box; background: #15120E; color: #F3EADB; display: flex; flex-direction: column;">
+
+  <header style="height: 72px; box-sizing: border-box; padding: 0 32px; display: flex; align-items: center; gap: 40px;">
+    <div style="display: flex; align-items: baseline; gap: 10px;">
+      <span style="font-family: 'Instrument Serif', Georgia, serif; font-size: 30px; line-height: 1;">Krar &amp; Begena</span>
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: #E8B04A;">Studio</span>
+    </div>
+    <nav style="display: flex; gap: 4px;" aria-label="Sections">
+      <a href="Main.dc.html" style="padding: 10px 16px; border-radius: 8px; background: #2B241C; color: #F3EADB; text-decoration: none; font-size: 14px; font-weight: 500;">Play</a>
+      <a href="Piano.dc.html" style="padding: 10px 16px; border-radius: 8px; color: #B3A391; text-decoration: none; font-size: 14px;">Piano</a>
+      <a href="Scales.dc.html" style="padding: 10px 16px; border-radius: 8px; color: #B3A391; text-decoration: none; font-size: 14px;">Scales</a>
+      <a href="Tutor.dc.html" style="padding: 10px 16px; border-radius: 8px; color: #B3A391; text-decoration: none; font-size: 14px;">Tab Tutor</a>
+      <a href="Engine.dc.html" style="padding: 10px 16px; border-radius: 8px; color: #B3A391; text-decoration: none; font-size: 14px;">Engine</a>
+    </nav>
+    <div style="flex-grow: 1;"></div>
+    <div role="group" aria-label="Instrument" style="display: flex; padding: 4px; gap: 4px; background: #1F1A15; border: 1px solid #3B3229; border-radius: 10px;">
+      <button type="button" aria-pressed="true" style="height: 36px; padding: 0 14px; border: 0; border-radius: 7px; background: #E8B04A; color: #15120E; font-size: 13px; font-weight: 600;">Begena · 5</button>
+      <button type="button" aria-pressed="false" style="height: 36px; padding: 0 14px; border: 0; border-radius: 7px; background: transparent; color: #B3A391; font-size: 13px;">Krar · 6</button>
+    </div>
+    <div style="display: flex; align-items: center; gap: 10px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #B3A391;">
+      <span style="width: 8px; height: 8px; border-radius: 50%; background: #4DB38A; box-shadow: 0 0 10px #4DB38A; animation: {{anim.pulse}};"></span>
+      <span>AudioWorklet · 48 kHz · 128 fr</span>
+    </div>
+  </header>
+
+  <svg width="1440" height="10" aria-hidden="true" style="display: block; flex-shrink: 0;">
+    <defs>
+      <pattern id="tibeb" width="60" height="10" patternUnits="userSpaceOnUse">
+        <rect width="60" height="10" fill="#1F1A15"></rect>
+        <path d="M0 5 L7.5 0 L15 5 L7.5 10Z" fill="#E8B04A"></path>
+        <path d="M15 5 L22.5 0 L30 5 L22.5 10Z" fill="#4DB38A"></path>
+        <path d="M30 5 L37.5 0 L45 5 L37.5 10Z" fill="#E2683C"></path>
+        <path d="M45 5 L52.5 0 L60 5 L52.5 10Z" fill="#5E8FE6"></path>
+      </pattern>
+    </defs>
+    <rect width="1440" height="10" fill="url(#tibeb)"></rect>
+  </svg>
+
+  <div style="flex-grow: 1; display: flex; min-height: 0;">
+
+    <main style="flex-grow: 1; display: flex; flex-direction: column; padding: 24px 32px 24px; gap: 18px; min-width: 0;">
+      <div style="display: flex; align-items: flex-end; justify-content: space-between;">
+        <div>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: #B3A391;">Now tuned to <span style="font-family: 'Noto Sans Ethiopic', sans-serif; letter-spacing: 0; text-transform: none; color: {{current.hue}};">ቅኝት · {{current.geez}}</span></div>
+          <h1 style="margin: 6px 0 0; font-family: 'Instrument Serif', Georgia, serif; font-weight: 400; font-size: 56px; line-height: 1; color: {{current.hue}};">{{current.name}}</h1>
+        </div>
+        <div style="display: flex; gap: 28px; align-items: flex-end; font-family: 'IBM Plex Mono', monospace;">
+          <div style="display: flex; flex-direction: column; gap: 4px; align-items: flex-end;">
+            <span style="font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: #B3A391;">Voices</span>
+            <span style="font-size: 22px;">{{voices}}<span style="color: #8C7D6C;"> / 5</span></span>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 4px; align-items: flex-end;">
+            <span style="font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: #B3A391;">Block</span>
+            <span style="font-size: 22px;">2.67<span style="color: #8C7D6C;"> ms</span></span>
+          </div>
+          <button type="button" class="strum" onClick="{{strum}}" style="height: 48px; padding: 0 20px; border: 0; border-radius: 12px; background: #E8B04A; color: #15120E; font-size: 15px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 10px;">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M3 3v12M7 3v12M11 3v12M15 3v12"></path><path d="M1 12 L17 6"></path></svg>
+            Strum
+          </button>
+        </div>
+      </div>
+
+      <div style="position: relative; flex-grow: 1; border-radius: 20px; background: radial-gradient(ellipse 60% 70% at 50% 45%, #2C2219 0%, #1B1612 75%); border: 1px solid #3B3229; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+        <div style="position: relative; width: 960px; height: 540px; flex-shrink: 0;">
+          <svg width="960" height="540" viewBox="0 0 960 540" aria-hidden="true" style="display: block; position: absolute; left: 0; top: 0;">
+            <defs>
+              <linearGradient id="wood" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#8A6A4A"></stop>
+                <stop offset="100%" stop-color="#5A4230"></stop>
+              </linearGradient>
+              <linearGradient id="skin" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#4A3A2A"></stop>
+                <stop offset="100%" stop-color="#2E241A"></stop>
+              </linearGradient>
+              <filter id="glow" x="-50%" y="-10%" width="200%" height="120%">
+                <feGaussianBlur stdDeviation="4" result="b"></feGaussianBlur>
+                <feMerge><feMergeNode in="b"></feMergeNode><feMergeNode in="SourceGraphic"></feMergeNode></feMerge>
+              </filter>
+            </defs>
+            <path d="M200 60 L180 440" stroke="url(#wood)" stroke-width="16" stroke-linecap="round"></path>
+            <path d="M760 60 L780 440" stroke="url(#wood)" stroke-width="16" stroke-linecap="round"></path>
+            <rect x="170" y="420" width="620" height="100" rx="18" fill="url(#skin)" stroke="#6B5140" stroke-width="2"></rect>
+            <g fill="#8A6A4A">
+              <circle cx="200" cy="440" r="3"></circle><circle cx="260" cy="440" r="3"></circle><circle cx="320" cy="440" r="3"></circle><circle cx="640" cy="440" r="3"></circle><circle cx="700" cy="440" r="3"></circle><circle cx="760" cy="440" r="3"></circle>
+            </g>
+            <rect x="160" y="34" width="640" height="34" rx="17" fill="url(#wood)"></rect>
+            <g fill="#E8B04A"><circle cx="280" cy="51" r="4"></circle></g>
+            <g fill="#E2683C"><circle cx="380" cy="51" r="4"></circle></g>
+            <g fill="#D94F7A"><circle cx="480" cy="51" r="4"></circle></g>
+            <g fill="#4DB38A"><circle cx="580" cy="51" r="4"></circle></g>
+            <g fill="#5E8FE6"><circle cx="680" cy="51" r="4"></circle></g>
+            <rect x="250" y="432" width="460" height="14" rx="5" fill="#A8845E"></rect>
+
+            <circle cx="{{s0.x}}" cy="{{s0.ty}}" r="22" fill="none" stroke="{{s0.color}}" stroke-width="2" opacity="{{s0.rip}}"><animate attributeName="r" values="{{anim.ripR}}" dur="1.3s" repeatCount="indefinite"></animate><animate attributeName="stroke-opacity" values="{{anim.ripO}}" dur="1.3s" repeatCount="indefinite"></animate></circle>
+            <circle cx="{{s1.x}}" cy="{{s1.ty}}" r="22" fill="none" stroke="{{s1.color}}" stroke-width="2" opacity="{{s1.rip}}"><animate attributeName="r" values="{{anim.ripR}}" dur="1.3s" repeatCount="indefinite"></animate><animate attributeName="stroke-opacity" values="{{anim.ripO}}" dur="1.3s" repeatCount="indefinite"></animate></circle>
+            <circle cx="{{s2.x}}" cy="{{s2.ty}}" r="22" fill="none" stroke="{{s2.color}}" stroke-width="2" opacity="{{s2.rip}}"><animate attributeName="r" values="{{anim.ripR}}" dur="1.3s" repeatCount="indefinite"></animate><animate attributeName="stroke-opacity" values="{{anim.ripO}}" dur="1.3s" repeatCount="indefinite"></animate></circle>
+            <circle cx="{{s3.x}}" cy="{{s3.ty}}" r="22" fill="none" stroke="{{s3.color}}" stroke-width="2" opacity="{{s3.rip}}"><animate attributeName="r" values="{{anim.ripR}}" dur="1.3s" repeatCount="indefinite"></animate><animate attributeName="stroke-opacity" values="{{anim.ripO}}" dur="1.3s" repeatCount="indefinite"></animate></circle>
+            <circle cx="{{s4.x}}" cy="{{s4.ty}}" r="22" fill="none" stroke="{{s4.color}}" stroke-width="2" opacity="{{s4.rip}}"><animate attributeName="r" values="{{anim.ripR}}" dur="1.3s" repeatCount="indefinite"></animate><animate attributeName="stroke-opacity" values="{{anim.ripO}}" dur="1.3s" repeatCount="indefinite"></animate></circle>
+
+            <g stroke-linecap="round" fill="none">
+              <path d="{{s0.rest}}" stroke="{{s0.color}}" stroke-width="{{s0.w}}" opacity="{{s0.op}}" filter="{{s0.filter}}"><animate attributeName="d" values="{{s0.vib}}" dur="0.09s" repeatCount="indefinite"></animate></path>
+              <path d="{{s1.rest}}" stroke="{{s1.color}}" stroke-width="{{s1.w}}" opacity="{{s1.op}}" filter="{{s1.filter}}"><animate attributeName="d" values="{{s1.vib}}" dur="0.1s" repeatCount="indefinite"></animate></path>
+              <path d="{{s2.rest}}" stroke="{{s2.color}}" stroke-width="{{s2.w}}" opacity="{{s2.op}}" filter="{{s2.filter}}"><animate attributeName="d" values="{{s2.vib}}" dur="0.08s" repeatCount="indefinite"></animate></path>
+              <path d="{{s3.rest}}" stroke="{{s3.color}}" stroke-width="{{s3.w}}" opacity="{{s3.op}}" filter="{{s3.filter}}"><animate attributeName="d" values="{{s3.vib}}" dur="0.07s" repeatCount="indefinite"></animate></path>
+              <path d="{{s4.rest}}" stroke="{{s4.color}}" stroke-width="{{s4.w}}" opacity="{{s4.op}}" filter="{{s4.filter}}"><animate attributeName="d" values="{{s4.vib}}" dur="0.06s" repeatCount="indefinite"></animate></path>
+            </g>
+
+            <g font-family="IBM Plex Mono, monospace" text-anchor="middle">
+              <text x="280" y="480" font-size="16" fill="{{s0.label}}">Db2</text>
+              <text x="280" y="500" font-size="11" fill="#B3A391">69 Hz</text>
+              <text x="380" y="480" font-size="16" fill="{{s1.label}}">Ab2</text>
+              <text x="380" y="500" font-size="11" fill="#B3A391">104 Hz</text>
+              <text x="480" y="480" font-size="16" fill="{{s2.label}}">Eb3</text>
+              <text x="480" y="500" font-size="11" fill="#B3A391">156 Hz</text>
+              <text x="580" y="480" font-size="16" fill="{{s3.label}}">Bb3</text>
+              <text x="580" y="500" font-size="11" fill="#B3A391">233 Hz</text>
+              <text x="680" y="480" font-size="16" fill="{{s4.label}}">F4</text>
+              <text x="680" y="500" font-size="11" fill="#B3A391">349 Hz</text>
+            </g>
+          </svg>
+          <sc-for list="{{strings}}" as="s" hint-placeholder-count="5">
+            <button type="button" class="pluck" onClick="{{s.pluck}}" aria-label="{{s.aria}}" style="position: absolute; top: 70px; width: 80px; height: 440px; left: {{s.btnLeft}};"></button>
+          </sc-for>
+        </div>
+        <div style="position: absolute; left: 20px; top: 18px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #B3A391;">Click a string to pluck it · on touch, up to 10 fingers</div>
+      </div>
+
+      <div style="height: 92px; display: flex; gap: 14px; align-items: stretch;">
+        <div style="width: 220px; box-sizing: border-box; padding: 12px 14px; border-radius: 12px; background: #1F1A15; border: 1px solid #3B3229; display: flex; flex-direction: column; gap: 8px;">
+          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: #B3A391;">Partials · <span style="color: {{last.color}};">{{last.name}}</span></span>
+          <div style="flex-grow: 1; display: flex; align-items: flex-end; gap: 6px;">
+            <sc-for list="{{partials}}" as="p" hint-placeholder-count="8">
+              <span style="flex-grow: 1; border-radius: 3px 3px 1px 1px; transform-origin: bottom; background: {{last.color}}; height: {{p.h}}; opacity: {{p.op}}; animation: {{p.anim}};"></span>
+            </sc-for>
+          </div>
+        </div>
+        <div style="flex-grow: 1; position: relative; border-radius: 12px; background: #1F1A15; border: 1px solid #3B3229; overflow: hidden;">
+          <span style="position: absolute; left: 14px; top: 10px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: #B3A391;">Output · master bus</span>
+          <svg width="1600" height="92" viewBox="0 0 1600 92" aria-hidden="true" style="display: block; animation: {{anim.scroll}};">
+            <defs>
+              <linearGradient id="waveG" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stop-color="#E8B04A"></stop>
+                <stop offset="25%" stop-color="#E2683C"></stop>
+                <stop offset="50%" stop-color="#E8B04A"></stop>
+                <stop offset="75%" stop-color="#E2683C"></stop>
+                <stop offset="100%" stop-color="#E8B04A"></stop>
+              </linearGradient>
+            </defs>
+            <line x1="0" y1="50" x2="1600" y2="50" stroke="#3B3229" stroke-width="1"></line>
+            <path d="{{wave}}" fill="none" stroke="url(#waveG)" stroke-width="1.6"></path>
+          </svg>
+        </div>
+      </div>
+    </main>
+
+    <aside style="width: 400px; box-sizing: border-box; border-left: 1px solid #3B3229; padding: 24px 28px; display: flex; flex-direction: column; gap: 26px; background: #1A1511;">
+      <section style="display: flex; flex-direction: column; gap: 14px;">
+        <h2 style="margin: 0; font-family: 'IBM Plex Mono', monospace; font-weight: 500; font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: #B3A391;">Qenet · mode</h2>
+        <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px;">
+          <sc-for list="{{scales}}" as="s" hint-placeholder-count="4">
+            <button type="button" onClick="{{s.pick}}" aria-pressed="{{s.pressed}}" style="height: 64px; box-sizing: border-box; padding: 0 14px; border-radius: 12px; text-align: left; display: flex; flex-direction: column; justify-content: center; gap: 2px; cursor: pointer; transition: background 200ms, transform 200ms; background: {{s.bg}}; color: {{s.fg}}; border: 1px solid {{s.border}}; transform: {{s.lift}};">
+              <span style="display: flex; justify-content: space-between; align-items: baseline;"><span style="font-size: 15px; font-weight: 600;">{{s.name}}</span><span style="font-family: 'Noto Sans Ethiopic', sans-serif; font-size: 13px; opacity: 0.85;">{{s.geez}}</span></span>
+              <span style="font-size: 12px; opacity: 0.8;">{{s.short}}</span>
+            </button>
+          </sc-for>
+        </div>
+      </section>
+
+      <section style="display: flex; flex-direction: column; gap: 12px;">
+        <div style="display: flex; justify-content: space-between; align-items: baseline;">
+          <h2 style="margin: 0; font-family: 'IBM Plex Mono', monospace; font-weight: 500; font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: #B3A391;">Play the degrees</h2>
+          <a href="Scales.dc.html" style="font-size: 13px;">Compare all</a>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 4px;">
+          <sc-for list="{{degrees}}" as="d" hint-placeholder-count="8">
+            <button type="button" class="deg" onClick="{{d.play}}" aria-label="{{d.aria}}" style="display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 10px 0 8px; border-radius: 8px; cursor: pointer; color: #F3EADB; transition: background 150ms; background: {{d.bg}}; border: 1px solid {{d.border}};">
+              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #8C7D6C;">{{d.n}}</span>
+              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px;">{{d.cents}}</span>
+              <span style="position: relative; width: 26px; height: 16px;">
+                <span style="position: absolute; left: 12px; bottom: 0; width: 2px; height: 16px; border-radius: 1px; background: #74B8AC; transform-origin: bottom; transition: transform 400ms cubic-bezier(.3,1.6,.5,1); transform: {{d.rot}};"></span>
+              </span>
+              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: {{d.devColor}};">{{d.dev}}</span>
+            </button>
+          </sc-for>
+        </div>
+        <p style="margin: 0; font-size: 13px; line-height: 1.5; color: #B3A391;">Needles lean toward how far each degree sits from the nearest piano key. Click one to hear it.</p>
+      </section>
+
+      <section style="display: flex; flex-direction: column; gap: 14px;">
+        <h2 style="margin: 0; font-family: 'IBM Plex Mono', monospace; font-weight: 500; font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: #B3A391;">String physics</h2>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="display: flex; justify-content: space-between; font-size: 14px;"><label for="damp">Damping</label><span style="font-family: 'IBM Plex Mono', monospace; color: #B3A391;">0.0015</span></div>
+          <input id="damp" type="range" min="0" max="100" value="30" style="width: 100%; margin: 0;">
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="display: flex; justify-content: space-between; font-size: 14px;"><label for="rev">Reverb</label><span style="font-family: 'IBM Plex Mono', monospace; color: #B3A391;">0.30</span></div>
+          <input id="rev" type="range" min="0" max="100" value="30" style="width: 100%; margin: 0;">
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="display: flex; justify-content: space-between; font-size: 14px;"><label for="vol">Master volume</label><span style="font-family: 'IBM Plex Mono', monospace; color: #B3A391;">0.80</span></div>
+          <input id="vol" type="range" min="0" max="100" value="80" style="width: 100%; margin: 0;">
+        </div>
+      </section>
+    </aside>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"motion":{"editor":"boolean","default":true},"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { scale: 'tizitaMinor', sounding: { 1: true, 3: true }, last: 1, lastDeg: -1 };
+    this.timers = {};
+  }
+  componentWillUnmount() {
+    for (var k in this.timers) clearTimeout(this.timers[k]);
+  }
+  audio() {
+    if (!this.ctx) {
+      var AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return null;
+      this.ctx = new AC();
+    }
+    if (this.ctx.state === 'suspended') this.ctx.resume();
+    return this.ctx;
+  }
+  karplus(freq, level) {
+    var ctx = this.audio();
+    if (!ctx) return;
+    var sr = ctx.sampleRate, len = Math.floor(sr * 2.6);
+    var buf = ctx.createBuffer(1, len, sr), out = buf.getChannelData(0);
+    var N = Math.max(2, Math.round(sr / freq)), line = new Float32Array(N), p = 0, n;
+    for (n = 0; n < N; n++) line[n] = Math.random() * 2 - 1;
+    for (n = 0; n < len; n++) {
+      var a = line[p], b = line[(p + 1) % N];
+      line[p] = 0.996 * 0.5 * (a + b);
+      out[n] = a;
+      p = (p + 1) % N;
+    }
+    var fade = Math.floor(sr * 0.08);
+    for (n = 0; n < fade; n++) out[len - 1 - n] *= n / fade;
+    var src = ctx.createBufferSource(), g = ctx.createGain();
+    src.buffer = buf; g.gain.value = level;
+    src.connect(g); g.connect(ctx.destination); src.start();
+  }
+  pluck(i) {
+    var self = this;
+    this.karplus([69, 104, 156, 233, 349][i], 0.35);
+    var s = Object.assign({}, this.demoDone ? this.state.sounding : {});
+    this.demoDone = true;
+    s[i] = true;
+    this.setState({ sounding: s, last: i });
+    clearTimeout(this.timers[i]);
+    this.timers[i] = setTimeout(function () {
+      var t = Object.assign({}, self.state.sounding); delete t[i];
+      self.setState({ sounding: t });
+    }, 2400);
+  }
+  strum() {
+    var self = this;
+    [0, 1, 2, 3, 4].forEach(function (i) {
+      self.timers['strum' + i] = setTimeout(function () { self.pluck(i); }, i * 70);
+    });
+  }
+  renderVals() {
+    var self = this;
+    var motion = this.props.motion ?? true;
+    try { if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) motion = false; } catch (e) {}
+    var data = [
+      { id: 'tizitaMinor', name: 'Tizita Minor', geez: 'ትዝታ', hue: '#E8B04A', short: 'Nostalgia, minor', cents: [0, 282, 386, 520, 678, 884, 1018, 1136] },
+      { id: 'tizitaMajor', name: 'Tizita Major', geez: 'ትዝታ', hue: '#E2683C', short: 'Nostalgia, major', cents: [0, 282, 386, 520, 678, 884, 1018, 1136] },
+      { id: 'ambassel', name: 'Ambassel', geez: 'አምባሰል', hue: '#5E8FE6', short: 'Melancholic', cents: [0, 182, 316, 520, 678, 812, 1018, 1136] },
+      { id: 'bati', name: 'Bati', geez: 'ባቲ', hue: '#4DB38A', short: 'Bright', cents: [0, 182, 316, 498, 678, 884, 1018, 1136] }
+    ];
+    var sel = this.state.scale;
+    var current = data.filter(function (d) { return d.id === sel; })[0];
+    var scales = data.map(function (d) {
+      var on = d.id === sel;
+      return {
+        name: d.name, geez: d.geez, short: d.short, pressed: on ? 'true' : 'false',
+        bg: on ? d.hue : '#221C16', fg: on ? '#15120E' : '#F3EADB', border: on ? d.hue : '#3B3229',
+        lift: on ? 'translateY(-2px)' : 'none',
+        pick: function () { self.setState({ scale: d.id }); }
+      };
+    });
+    var degrees = current.cents.map(function (c, i) {
+      var dev = Math.round(c - Math.round(c / 100) * 100);
+      var on = self.state.lastDeg === i;
+      return {
+        n: String(i + 1), cents: String(c),
+        aria: 'Play degree ' + (i + 1) + ', ' + c + ' cents',
+        dev: dev === 0 ? '0' : (dev > 0 ? '+' + dev : '−' + Math.abs(dev)),
+        devColor: dev === 0 ? '#8C7D6C' : '#74B8AC',
+        rot: 'rotate(' + Math.max(-40, Math.min(40, dev * 1.6)) + 'deg)',
+        bg: on ? '#3A2E1F' : '#221C16', border: on ? current.hue : '#221C16',
+        play: function () {
+          self.karplus(138.6 * Math.pow(2, c / 1200), 0.35);
+          self.setState({ lastDeg: i });
+          clearTimeout(self.timers.deg);
+          self.timers.deg = setTimeout(function () { self.setState({ lastDeg: -1 }); }, 700);
+        }
+      };
+    });
+    var X = [280, 380, 480, 580, 680], W = [3.4, 3, 2.6, 2.2, 1.9], AMP = [16, 14, 12, 10, 8];
+    var C = ['#E8B04A', '#E2683C', '#D94F7A', '#4DB38A', '#5E8FE6'];
+    var NAMES = ['Db2', 'Ab2', 'Eb3', 'Bb3', 'F4'], TY = [330, 300, 260, 210, 250];
+    var voices = 0;
+    var strings = X.map(function (x, i) {
+      var on = !!self.state.sounding[i];
+      if (on) voices++;
+      var rest = 'M' + x + ' 68 L' + x + ' 432';
+      var up = 'M' + x + ' 68 Q' + (x + AMP[i]) + ' 250 ' + x + ' 432';
+      var dn = 'M' + x + ' 68 Q' + (x - AMP[i]) + ' 250 ' + x + ' 432';
+      var mid = 'M' + x + ' 68 Q' + x + ' 250 ' + x + ' 432';
+      return {
+        x: x, ty: TY[i], color: C[i], w: on ? W[i] + 0.6 : W[i],
+        rest: rest,
+        vib: on && motion ? [up, dn, up].join(';') : (on ? up + ';' + up : mid + ';' + mid),
+        op: on ? 1 : 0.55, filter: on ? 'url(#glow)' : 'none',
+        rip: on ? 1 : 0, label: on ? C[i] : '#F3EADB',
+        btnLeft: (x - 40) + 'px', aria: 'Pluck ' + NAMES[i],
+        pluck: function () { self.pluck(i); }
+      };
+    });
+    var harm = [1.0, 0.8, 0.6, 0.4, 0.3, 0.2, 0.15, 0.1];
+    var partials = harm.map(function (h, i) {
+      return {
+        h: Math.round(h * 44) + 'px', op: 0.45 + h * 0.55,
+        anim: motion ? 'kbBreathe ' + (0.9 + i * 0.12).toFixed(2) + 's ease-in-out ' + (i * 0.08).toFixed(2) + 's infinite' : 'none'
+      };
+    });
+    var pts = [];
+    for (var x = 0; x <= 1600; x += 2) {
+      var t = (x % 400) / 400;
+      var env = Math.exp(-t * 3.2) * (1 - Math.exp(-t * 60));
+      var y = 50 - 30 * env * (0.62 * Math.sin(x * 0.46) + 0.28 * Math.sin(x * 0.69 + 0.7) + 0.1 * Math.sin(x * 1.38));
+      pts.push((x === 0 ? 'M' : 'L') + x + ' ' + y.toFixed(1));
+    }
+    return {
+      scales: scales, current: current, degrees: degrees, strings: strings,
+      s0: strings[0], s1: strings[1], s2: strings[2], s3: strings[3], s4: strings[4],
+      voices: String(voices), partials: partials,
+      last: { name: NAMES[this.state.last], color: C[this.state.last] },
+      wave: pts.join(' '),
+      strum: function () { self.strum(); },
+      anim: {
+        pulse: motion ? 'kbPulse 1.6s ease-in-out infinite' : 'none',
+        scroll: motion ? 'kbScroll 3.2s linear infinite' : 'none',
+        ripR: motion ? '20;64' : '30;30',
+        ripO: motion ? '0.9;0' : '0.5;0.5'
+      }
+    };
+  }
+}
+</script>
+</body>
+</html>

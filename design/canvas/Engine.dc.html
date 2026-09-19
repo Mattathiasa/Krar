@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>How the sound is made</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#15120E;font-family:'IBM Plex Sans',system-ui,sans-serif;color:#F3EADB}
+a{color:#E8B04A}a:hover{color:#F6D08A}
+.flow{stroke-dasharray:6 6;animation:kbFlow .8s linear infinite}
+@keyframes kbFlow{to{stroke-dashoffset:-12}}
+@keyframes kbOrbit{to{offset-distance:100%}}
+@media (prefers-reduced-motion: reduce){*{animation:none !important}}
+code{font-family:'IBM Plex Mono',monospace;font-size:0.92em;color:#F6D08A}
+</style>
+</helmet>
+<div style="width: 1440px; height: 900px; box-sizing: border-box; background: #15120E; color: #F3EADB; display: flex; flex-direction: column;">
+
+  <header style="height: 72px; box-sizing: border-box; padding: 0 32px; display: flex; align-items: center; gap: 40px;">
+    <div style="display: flex; align-items: baseline; gap: 10px;">
+      <span style="font-family: 'Instrument Serif', Georgia, serif; font-size: 30px; line-height: 1;">Krar &amp; Begena</span>
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: #E8B04A;">Studio</span>
+    </div>
+    <nav style="display: flex; gap: 4px;" aria-label="Sections">
+      <a href="Main.dc.html" style="padding: 10px 16px; border-radius: 8px; color: #B3A391; text-decoration: none; font-size: 14px;">Play</a>
+      <a href="Piano.dc.html" style="padding: 10px 16px; border-radius: 8px; color: #B3A391; text-decoration: none; font-size: 14px;">Piano</a>
+      <a href="Scales.dc.html" style="padding: 10px 16px; border-radius: 8px; color: #B3A391; text-decoration: none; font-size: 14px;">Scales</a>
+      <a href="Tutor.dc.html" style="padding: 10px 16px; border-radius: 8px; color: #B3A391; text-decoration: none; font-size: 14px;">Tab Tutor</a>
+      <a href="Engine.dc.html" style="padding: 10px 16px; border-radius: 8px; background: #2B241C; color: #F3EADB; text-decoration: none; font-size: 14px; font-weight: 500;">Engine</a>
+    </nav>
+  </header>
+
+  <svg width="1440" height="10" aria-hidden="true" style="display: block; flex-shrink: 0;">
+    <defs>
+      <pattern id="tibeb" width="60" height="10" patternUnits="userSpaceOnUse">
+        <rect width="60" height="10" fill="#1F1A15"></rect>
+        <path d="M0 5 L7.5 0 L15 5 L7.5 10Z" fill="#E8B04A"></path>
+        <path d="M15 5 L22.5 0 L30 5 L22.5 10Z" fill="#4DB38A"></path>
+        <path d="M30 5 L37.5 0 L45 5 L37.5 10Z" fill="#E2683C"></path>
+        <path d="M45 5 L52.5 0 L60 5 L52.5 10Z" fill="#5E8FE6"></path>
+      </pattern>
+    </defs>
+    <rect width="1440" height="10" fill="url(#tibeb)"></rect>
+  </svg>
+
+  <div style="padding: 36px 48px 0;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: #B3A391;">Under the hood</div>
+    <h1 style="margin: 8px 0 0; font-family: 'Instrument Serif', Georgia, serif; font-weight: 400; font-size: 56px; line-height: 1;">No samples. Every note is a <span style="font-style: italic; color: #E8B04A;">simulated string.</span></h1>
+  </div>
+
+  <div style="padding: 32px 48px 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px;">
+    <section style="border-radius: 16px; background: #1F1A15; border: 1px solid #3B3229; border-top: 4px solid #5E8FE6; padding: 24px; display: flex; flex-direction: column; gap: 12px;">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: #B3A391;">Main thread</span>
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #8C7D6C;">01</span>
+      </div>
+      <h2 style="margin: 0; font-size: 22px; font-weight: 600;">Flutter Web canvas</h2>
+      <p style="margin: 0; font-size: 14px; line-height: 1.55; color: #B3A391;">Pointer events from up to ten fingers are hit-tested against string positions in <code>StringCanvas</code>. Each crossing becomes a <code>pluck(string, velocity)</code> message.</p>
+    </section>
+    <section style="border-radius: 16px; background: #1F1A15; border: 1px solid #E8B04A; border-top: 4px solid #E8B04A; padding: 24px; box-shadow: 0 0 40px rgba(232,176,74,0.12); display: flex; flex-direction: column; gap: 12px;">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: #E8B04A;">Audio thread</span>
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #8C7D6C;">02</span>
+      </div>
+      <h2 style="margin: 0; font-size: 22px; font-weight: 600;">AudioWorkletProcessor</h2>
+      <p style="margin: 0; font-size: 14px; line-height: 1.55; color: #B3A391;"><code>krar-processor</code> fills 128 frames per <code>process()</code> call — 2.67 ms at 48 kHz — on a thread the UI can never block.</p>
+    </section>
+    <section style="border-radius: 16px; background: #1F1A15; border: 1px solid #3B3229; border-top: 4px solid #E2683C; padding: 24px; display: flex; flex-direction: column; gap: 12px;">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: #B3A391;">WebAssembly</span>
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #8C7D6C;">03</span>
+      </div>
+      <h2 style="margin: 0; font-size: 22px; font-weight: 600;">Rust <code style="font-size: 18px;">KrarEngine</code></h2>
+      <p style="margin: 0; font-size: 14px; line-height: 1.55; color: #B3A391;">Compiled with <code>wasm-bindgen</code>. Owns one string model per voice, the active qenet tuning, reverb and master gain.</p>
+    </section>
+  </div>
+
+  <section aria-label="Karplus-Strong signal flow" style="margin: 24px 48px 40px; flex-grow: 1; border-radius: 20px; background: #1B1612; border: 1px solid #3B3229; display: flex; gap: 40px; padding: 28px 32px; align-items: center;">
+    <div style="width: 300px; flex-shrink: 0; display: flex; flex-direction: column; gap: 12px;">
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: #B3A391;">Inside one string</span>
+      <h2 style="margin: 0; font-family: 'Instrument Serif', Georgia, serif; font-weight: 400; font-size: 36px; line-height: 1.05;">Karplus–Strong</h2>
+      <p style="margin: 0; font-size: 14px; line-height: 1.55; color: #B3A391;">A burst of noise circulates through a delay line one period long. Each pass is averaged and damped, so high harmonics fade first — exactly how a gut string rings out.</p>
+      <div style="margin-top: 4px; padding: 12px 14px; border-radius: 10px; background: #221C16; font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: #F3EADB;">y[n] = ρ · ½ (y[n−N] + y[n−N−1])<br><span style="color: #8C7D6C;">N = f<sub>s</sub> / f₀</span></div>
+    </div>
+    <svg width="760" height="260" viewBox="0 0 760 260" role="img" aria-label="Noise burst feeds a delay line, then an averaging filter and damping, which loops back and also goes to the output" style="flex-shrink: 0;">
+      <defs>
+        <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#E8B04A"></path></marker>
+      </defs>
+      <g font-family="IBM Plex Sans, sans-serif" font-size="15" fill="#F3EADB" text-anchor="middle">
+        <rect x="0" y="80" width="130" height="64" rx="12" fill="#221C16" stroke="#3B3229"></rect>
+        <text x="65" y="108">Noise burst</text>
+        <text x="65" y="128" font-family="IBM Plex Mono, monospace" font-size="11" fill="#8C7D6C">pluck(velocity)</text>
+
+        <circle cx="190" cy="112" r="18" fill="#221C16" stroke="#B3A391"></circle>
+        <text x="190" y="117" font-size="18">+</text>
+
+        <rect x="250" y="80" width="170" height="64" rx="12" fill="#221C16" stroke="#E8B04A" stroke-width="2"></rect>
+        <text x="335" y="108">Delay line</text>
+        <text x="335" y="128" font-family="IBM Plex Mono, monospace" font-size="11" fill="#8C7D6C">z⁻ᴺ · 1024 samples</text>
+
+        <rect x="480" y="80" width="150" height="64" rx="12" fill="#221C16" stroke="#3B3229"></rect>
+        <text x="555" y="108">Average</text>
+        <text x="555" y="128" font-family="IBM Plex Mono, monospace" font-size="11" fill="#8C7D6C">½(1 + z⁻¹)</text>
+
+        <rect x="480" y="190" width="150" height="56" rx="12" fill="#221C16" stroke="#3B3229"></rect>
+        <text x="555" y="214">Damping ρ</text>
+        <text x="555" y="232" font-family="IBM Plex Mono, monospace" font-size="11" fill="#8C7D6C">per-harmonic decay</text>
+
+        <text x="720" y="100" font-size="14" fill="#E8B04A">Out</text>
+      </g>
+      <g stroke="#E8B04A" stroke-width="2" fill="none" class="flow">
+        <line x1="130" y1="112" x2="170" y2="112" marker-end="url(#ar)"></line>
+        <line x1="208" y1="112" x2="248" y2="112" marker-end="url(#ar)"></line>
+        <line x1="420" y1="112" x2="478" y2="112" marker-end="url(#ar)"></line>
+        <line x1="630" y1="112" x2="700" y2="112" marker-end="url(#ar)"></line>
+        <path d="M660 112 L660 218 L632 218" marker-end="url(#ar)"></path>
+        <path d="M480 218 L190 218 L190 132" marker-end="url(#ar)"></path>
+      </g>
+      <circle cx="660" cy="112" r="3.5" fill="#E8B04A"></circle>
+      <circle r="6" fill="#E2683C"><animateMotion dur="2.4s" repeatCount="indefinite" path="M190 112 L420 112 L630 112 L660 112 L660 218 L480 218 L190 218 Z"></animateMotion></circle>
+      <circle r="4" fill="#4DB38A"><animateMotion dur="2.4s" begin="-1.2s" repeatCount="indefinite" path="M190 112 L420 112 L630 112 L660 112 L660 218 L480 218 L190 218 Z"></animateMotion></circle>
+      <text x="330" y="208" font-family="IBM Plex Mono, monospace" font-size="11" fill="#8C7D6C" text-anchor="middle">feedback</text>
+    </svg>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>
