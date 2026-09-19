@@ -44,6 +44,14 @@ impl StringConfig {
     pub fn frequency(&self) -> f32 {
         self.frequency
     }
+
+    pub fn tension(&self) -> f32 {
+        self.tension
+    }
+
+    pub fn damping(&self) -> f32 {
+        self.damping
+    }
 }
 
 #[wasm_bindgen]
@@ -55,11 +63,16 @@ pub struct StringState {
     buffer_index: usize,
     pub decay: f32,
     pub phase: f32,
+    harmonics: Vec<f32>,
+    harmonic_damping: Vec<f32>,
 }
 
 #[wasm_bindgen]
 impl StringState {
     pub fn new() -> Self {
+        let harmonics = vec![1.0, 0.8, 0.6, 0.4, 0.3, 0.2, 0.15, 0.1];
+        let harmonic_damping = vec![0.999, 0.998, 0.997, 0.996, 0.995, 0.994, 0.993, 0.992];
+
         StringState {
             frequency: 440.0,
             velocity: 0.0,
@@ -68,6 +81,8 @@ impl StringState {
             buffer_index: 0,
             decay: 0.999,
             phase: 0.0,
+            harmonics,
+            harmonic_damping,
         }
     }
 
@@ -79,7 +94,13 @@ impl StringState {
         self.buffer.resize(buffer_length, 0.0);
 
         for i in 0..buffer_length {
-            self.buffer[i] = (js_sys::Math::random() as f32 * 2.0 - 1.0) * velocity;
+            let mut sample = 0.0;
+            for (h, &harmonic_amp) in self.harmonics.iter().enumerate() {
+                let harmonic_freq = self.frequency * (h + 1) as f32;
+                let phase = (i as f32 / sample_rate as f32) * harmonic_freq * 2.0 * std::f32::consts::PI;
+                sample += (phase.sin() * harmonic_amp * (js_sys::Math::random() as f32 * 2.0 - 1.0));
+            }
+            self.buffer[i] = sample * velocity * 0.25;
         }
 
         self.buffer_index = 0;
@@ -121,6 +142,14 @@ impl StringState {
         }
 
         output
+    }
+
+    pub fn get_harmonics(&self) -> Vec<f32> {
+        self.harmonics.clone()
+    }
+
+    pub fn set_harmonics(&mut self, harmonics: Vec<f32>) {
+        self.harmonics = harmonics;
     }
 }
 

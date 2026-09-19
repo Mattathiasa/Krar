@@ -11,6 +11,8 @@ pub struct KrarEngine {
     active_scale: ScaleType,
     buffer: Vec<f32>,
     note_frequencies: HashMap<String, f32>,
+    master_volume: f32,
+    reverb_amount: f32,
 }
 
 #[wasm_bindgen]
@@ -26,6 +28,8 @@ impl KrarEngine {
             active_scale: ScaleType::TizitaMinor,
             buffer: vec![0.0; 1024],
             note_frequencies: HashMap::new(),
+            master_volume: 0.8,
+            reverb_amount: 0.2,
         };
 
         engine.init_note_frequencies();
@@ -34,7 +38,8 @@ impl KrarEngine {
 
     pub fn pluck(&mut self, string_id: u32, velocity: f32) {
         if let Some(string) = self.strings.get_mut(string_id as usize) {
-            string.pluck(velocity, self.sample_rate);
+            let clamped_velocity = velocity.clamp(0.0, 1.0);
+            string.pluck(clamped_velocity, self.sample_rate);
         }
     }
 
@@ -65,7 +70,7 @@ impl KrarEngine {
         let num_strings = self.strings.len() as f32;
         if num_strings > 0.0 {
             for sample in self.buffer.iter_mut() {
-                *sample /= num_strings;
+                *sample = (*sample / num_strings) * self.master_volume;
             }
         }
 
@@ -82,6 +87,39 @@ impl KrarEngine {
     pub fn set_string_frequency(&mut self, string_id: u32, frequency: f32) {
         if let Some(string) = self.strings.get_mut(string_id as usize) {
             string.set_frequency(frequency, self.sample_rate);
+        }
+    }
+
+    pub fn set_master_volume(&mut self, volume: f32) {
+        self.master_volume = volume.clamp(0.0, 1.0);
+    }
+
+    pub fn get_master_volume(&self) -> f32 {
+        self.master_volume
+    }
+
+    pub fn set_reverb(&mut self, amount: f32) {
+        self.reverb_amount = amount.clamp(0.0, 1.0);
+    }
+
+    pub fn get_reverb(&self) -> f32 {
+        self.reverb_amount
+    }
+
+    pub fn num_strings(&self) -> u32 {
+        self.strings.len() as u32
+    }
+
+    pub fn get_string_config(&self, string_id: u32) -> Vec<f32> {
+        if let Some(string) = self.strings.get(string_id as usize) {
+            vec![
+                string.frequency,
+                string.velocity,
+                if string.is_plucked { 1.0 } else { 0.0 },
+                string.decay,
+            ]
+        } else {
+            vec![0.0; 4]
         }
     }
 
