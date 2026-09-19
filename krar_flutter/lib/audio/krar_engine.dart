@@ -1,23 +1,20 @@
 import 'dart:js_interop';
-import 'package:web/web.dart' as web;
 import 'audio_bridge.dart';
 import '../widgets/scale_selector.dart';
 
 class KrarEngine {
   KrarEngineJS? _engine;
   bool _isInitialized = false;
-  int _sampleRate = 48000;
-  int _numStrings = 5;
+  final int _sampleRate = 48000;
+  final int _numStrings = 5;
 
   Future<void> initialize() async {
     try {
-      await initAudioJS().toDart;
-      await startAudioJS().toDart;
+      await initAudioJS();
+      await startAudioJS();
       _engine = KrarEngineJS(_sampleRate, _numStrings);
       _isInitialized = true;
-      print('Krar engine initialized successfully');
     } catch (e) {
-      print('Failed to initialize Krar engine: $e');
       rethrow;
     }
   }
@@ -39,7 +36,12 @@ class KrarEngine {
 
   List<double> getAudioBuffer() {
     if (!_isInitialized || _engine == null) return [];
-    return _engine!.getAudioBuffer().toList();
+    final jsArray = _engine!.getAudioBuffer();
+    final dartList = <double>[];
+    for (var i = 0; i < jsArray.length; i++) {
+      dartList.add((jsArray[i] as JSNumber).toDartDouble);
+    }
+    return dartList;
   }
 
   double getStringFrequency(int stringId) {
@@ -79,7 +81,12 @@ class KrarEngine {
 
   List<double> getStringConfig(int stringId) {
     if (!_isInitialized || _engine == null) return [];
-    return _engine!.getStringConfig(stringId).toList();
+    final jsArray = _engine!.getStringConfig(stringId);
+    final dartList = <double>[];
+    for (var i = 0; i < jsArray.length; i++) {
+      dartList.add((jsArray[i] as JSNumber).toDartDouble);
+    }
+    return dartList;
   }
 
   bool get isInitialized => _isInitialized;

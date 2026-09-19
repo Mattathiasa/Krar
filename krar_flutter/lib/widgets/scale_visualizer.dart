@@ -190,7 +190,7 @@ class ScaleDiagramPainter extends CustomPainter {
 
       points.add(Offset(x, y));
 
-      canvas.drawCircle(x: x, y: y, radius: 4.0, paint: pointPaint);
+      canvas.drawCircle(Offset(x, y), 4.0, pointPaint);
 
       final textPainter = TextPainter(
         text: TextSpan(

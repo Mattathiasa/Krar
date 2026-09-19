@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 import '../audio/krar_engine.dart';
 
@@ -217,22 +218,23 @@ class StringPainter extends CustomPainter {
             (normalizedX) *
             4.0 *
             (normalizedX < 0.5 ? normalizedX * 2 : (1 - normalizedX) * 2);
-        final dy = vibration * (phase * 0.1).sin();
+        final dy = vibration * sin(phase * 0.1);
         path.lineTo(x, y + dy);
       }
 
       canvas.drawPath(path, glowPaint);
       canvas.drawPath(path, basePaint);
 
-      final stringNamePaint = Paint()
-        ..color = Colors.white.withAlpha(velocity > 0.0 ? 255 : 128)
-        ..fontSize = 12.0;
+      final stringNameStyle = TextStyle(
+        color: Colors.white.withAlpha(velocity > 0.0 ? 255 : 128),
+        fontSize: 12.0,
+      );
 
       final stringNames = ['Db2', 'Ab2', 'Eb3', 'Bb3', 'F4'];
       final textPainter = TextPainter(
         text: TextSpan(
           text: stringNames[i],
-          style: stringNamePaint,
+          style: stringNameStyle,
         ),
         textDirection: TextDirection.ltr,
       );

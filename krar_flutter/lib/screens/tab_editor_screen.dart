@@ -64,7 +64,6 @@ class _TabEditorScreenState extends State<TabEditorScreen> {
     ];
 
     if (string >= 0 && string < frequencies.length) {
-      final frequency = frequencies[string] * (fret > 0 ? 1.0 + (fret * 0.059463) : 1.0);
       widget.engine.pluck(string, 0.8);
     }
   }
