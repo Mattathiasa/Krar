@@ -1,0 +1,14 @@
+{
+  "name": "krar-begena-studio",
+  "version": "0.1.0",
+  "description": "Microtonal Acoustic Synthesizer & Tab Tutor for Ethiopian Lyres",
+  "private": true,
+  "scripts": {
+    "build:engine": "cd krar_engine && wasm-pack build --target web",
+    "dev": "cd krar_flutter && flutter run -d chrome",
+    "build": "cd krar_flutter && flutter build web"
+  },
+  "keywords": ["krar", "begena", "ethiopian", "microtonal", "synthesizer", "wasm", "flutter"],
+  "author": "",
+  "license": "MIT"
+}

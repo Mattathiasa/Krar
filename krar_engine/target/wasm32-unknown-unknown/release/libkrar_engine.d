@@ -1,0 +1,1 @@
+/Users/mattathiasa/Projects/Krar/krar_engine/target/wasm32-unknown-unknown/release/libkrar_engine.rlib: /Users/mattathiasa/Projects/Krar/krar_engine/src/karplus_strong.rs /Users/mattathiasa/Projects/Krar/krar_engine/src/lib.rs /Users/mattathiasa/Projects/Krar/krar_engine/src/scale.rs /Users/mattathiasa/Projects/Krar/krar_engine/src/string_model.rs
