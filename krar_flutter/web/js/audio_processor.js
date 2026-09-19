@@ -4,11 +4,13 @@ class KrarProcessor extends AudioWorkletProcessor {
     this.buffer = new Float32Array(128);
     this.bufferIndex = 0;
     this.isRunning = false;
+    this.bufferReady = false;
 
     this.port.onmessage = (event) => {
       if (event.data.type === 'buffer') {
         this.buffer = new Float32Array(event.data.buffer);
         this.bufferIndex = 0;
+        this.bufferReady = true;
       }
     };
   }
@@ -25,13 +27,15 @@ class KrarProcessor extends AudioWorkletProcessor {
       const outputChannel = output[channel];
 
       for (let i = 0; i < outputChannel.length; i++) {
-        if (this.bufferIndex < this.buffer.length) {
+        if (this.bufferReady && this.bufferIndex < this.buffer.length) {
           outputChannel[i] = this.buffer[this.bufferIndex];
           this.bufferIndex++;
         } else {
           outputChannel[i] = 0;
-          this.port.postMessage({ type: 'getBuffer' });
-          this.bufferIndex = 0;
+          if (this.bufferReady) {
+            this.port.postMessage({ type: 'getBuffer' });
+            this.bufferIndex = 0;
+          }
         }
       }
     }

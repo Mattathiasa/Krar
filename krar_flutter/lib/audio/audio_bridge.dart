@@ -10,6 +10,12 @@ class KrarEngineJS {
   external Float32List getAudioBuffer();
   external double getStringFrequency(int stringId);
   external void setStringFrequency(int stringId, double frequency);
+  external void setMasterVolume(double volume);
+  external double getMasterVolume();
+  external void setReverb(double amount);
+  external double getReverb();
+  external int numStrings();
+  external Float32List getStringConfig(int stringId);
 }
 
 @JS('initAudio')
@@ -20,3 +26,6 @@ external PromiseJSObject<void> startAudioJS();
 
 @JS('stopAudio')
 external PromiseJSObject<void> stopAudioJS();
+
+@JS('isAudioStarted')
+external bool isAudioStartedJS();

@@ -12,6 +12,7 @@ class KrarEngine {
   Future<void> initialize() async {
     try {
       await initAudioJS().toDart;
+      await startAudioJS().toDart;
       _engine = KrarEngineJS(_sampleRate, _numStrings);
       _isInitialized = true;
       print('Krar engine initialized successfully');
@@ -50,6 +51,38 @@ class KrarEngine {
     if (!_isInitialized || _engine == null) return;
     _engine!.setStringFrequency(stringId, frequency);
   }
+
+  void setMasterVolume(double volume) {
+    if (!_isInitialized || _engine == null) return;
+    _engine!.setMasterVolume(volume);
+  }
+
+  double getMasterVolume() {
+    if (!_isInitialized || _engine == null) return 0.0;
+    return _engine!.getMasterVolume();
+  }
+
+  void setReverb(double amount) {
+    if (!_isInitialized || _engine == null) return;
+    _engine!.setReverb(amount);
+  }
+
+  double getReverb() {
+    if (!_isInitialized || _engine == null) return 0.0;
+    return _engine!.getReverb();
+  }
+
+  int get numStrings {
+    if (!_isInitialized || _engine == null) return 0;
+    return _engine!.numStrings();
+  }
+
+  List<double> getStringConfig(int stringId) {
+    if (!_isInitialized || _engine == null) return [];
+    return _engine!.getStringConfig(stringId).toList();
+  }
+
+  bool get isInitialized => _isInitialized;
 
   void dispose() {
     _isInitialized = false;

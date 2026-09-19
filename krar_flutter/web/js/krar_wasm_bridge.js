@@ -3,6 +3,7 @@ import init, { KrarEngine } from '../../krar_engine/pkg/krar_engine.js';
 let engine = null;
 let audioContext = null;
 let audioWorkletNode = null;
+let isStarted = false;
 
 export async function initAudio() {
   try {
@@ -16,6 +17,8 @@ export async function initAudio() {
 
 export async function startAudio() {
   try {
+    if (isStarted) return;
+
     audioContext = new (window.AudioContext || window.webkitAudioContext)({
       sampleRate: 48000,
     });
@@ -29,6 +32,7 @@ export async function startAudio() {
     });
 
     engine = new KrarEngine(48000, 5);
+
     audioWorkletNode.port.onmessage = (event) => {
       if (event.data.type === 'getBuffer') {
         const buffer = engine.get_audio_buffer();
@@ -40,6 +44,7 @@ export async function startAudio() {
     };
 
     audioWorkletNode.connect(audioContext.destination);
+    isStarted = true;
     console.log('Audio started');
   } catch (error) {
     console.error('Failed to start audio:', error);
@@ -57,10 +62,16 @@ export async function stopAudio() {
     audioContext = null;
   }
   engine = null;
+  isStarted = false;
   console.log('Audio stopped');
+}
+
+export function isAudioStarted() {
+  return isStarted;
 }
 
 window.KrarEngine = KrarEngine;
 window.initAudio = initAudio;
 window.startAudio = startAudio;
 window.stopAudio = stopAudio;
+window.isAudioStarted = isAudioStarted;
