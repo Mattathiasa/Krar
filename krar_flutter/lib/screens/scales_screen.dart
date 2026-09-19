@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 
@@ -92,7 +93,7 @@ class _ScalesScreenState extends State<ScalesScreen> with SingleTickerProviderSt
       children: [
         Padding(padding: EdgeInsets.fromLTRB(pad, 30, pad, 24), child: _Intro(wide: wide)),
         for (final r in rows)
-          Padding(padding: EdgeInsets.fromLTRB(pad, 0, pad, 12), child: SizedBox(height: wide ? 136 : 176, child: r)),
+          Padding(padding: EdgeInsets.fromLTRB(pad, 0, pad, 12), child: SizedBox(height: wide ? 136 : 200, child: r)),
       ],
     );
   }
@@ -261,6 +262,12 @@ class _RulerPainter extends CustomPainter {
     }
 
     final cents = scale.cents;
+    // On a narrow ruler neighbouring labels collide, so alternate them onto two rows.
+    var minGap = double.infinity;
+    for (var d = 1; d < cents.length; d++) {
+      minGap = min(minGap, px(cents[d]) - px(cents[d - 1]));
+    }
+    final stagger = minGap < 40;
     for (var d = 0; d < cents.length; d++) {
       final c = cents[d];
       final et = (c / 100).round() * 100.0;
@@ -289,8 +296,9 @@ class _RulerPainter extends CustomPainter {
       canvas.drawCircle(Offset(b, y), r + 3, Paint()..color = StudioColors.surface);
       canvas.drawCircle(Offset(b, y), r, Paint()..color = scale.hue);
 
-      _label(canvas, '${c.round()}', Offset(b, y - 34), StudioText.mono(13, color: on ? scale.hue : StudioColors.text), pop);
-      _label(canvas, formatDeviation(dev, zero: '±0'), Offset(b, y + 16),
+      final lift = stagger && d.isOdd ? 17.0 : 0.0;
+      _label(canvas, '${c.round()}', Offset(b, y - 34 - lift), StudioText.mono(13, color: on ? scale.hue : StudioColors.text), pop);
+      _label(canvas, formatDeviation(dev, zero: '±0'), Offset(b, y + 16 + lift),
           StudioText.mono(12, color: dev.abs() >= 15 ? StudioColors.teal : StudioColors.dim), pop);
     }
   }

@@ -190,16 +190,18 @@ class _TutorScreenState extends State<TutorScreen> with SingleTickerProviderStat
           ],
         ),
         const SizedBox(height: 22),
-        _staff(),
+        _staff(wide),
         const SizedBox(height: 22),
         _timingCard(),
       ],
     );
   }
 
-  Widget _staff() {
+  Widget _staff(bool wide) {
+    final caption = StudioText.mono(12, color: StudioColors.paperMuted);
+    final tempo = Text('♩ = $_bpm · 4/4 · beat ${(_step % 8) ~/ 2 + 1}', style: caption);
     return Container(
-      padding: const EdgeInsets.fromLTRB(40, 34, 40, 26),
+      padding: wide ? const EdgeInsets.fromLTRB(40, 34, 40, 26) : const EdgeInsets.fromLTRB(14, 20, 14, 16),
       decoration: BoxDecoration(
         color: StudioColors.paper,
         borderRadius: BorderRadius.circular(20),
@@ -208,17 +210,19 @@ class _TutorScreenState extends State<TutorScreen> with SingleTickerProviderStat
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Flexible(
-                child: Text('6-string krar tab · lines = strings, top = string 1',
-                    style: StudioText.mono(12, color: StudioColors.paperMuted)),
-              ),
-              Text('♩ = $_bpm · 4/4 · beat ${(_step % 8) ~/ 2 + 1}',
-                  style: StudioText.mono(12, color: StudioColors.paperMuted)),
-            ],
-          ),
+          if (wide)
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Flexible(child: Text('6-string krar tab · lines = strings, top = string 1', style: caption)),
+                tempo,
+              ],
+            )
+          else ...[
+            Text('Krar tab · top line = string 1', style: caption),
+            const SizedBox(height: 4),
+            tempo,
+          ],
           const SizedBox(height: 28),
           Semantics(
             label: 'Tab, now on note ${_step + 1} of ${kLessonTab.length}: pluck string ${_current + 1}',

@@ -2,3 +2,6 @@ krar_engine/pkg/
 krar_engine/target/
 krar_flutter/build/
 *.wasm
+
+# Built by krar_engine/ios/build-xcframework.sh
+krar_engine/ios/KrarEngine.xcframework/

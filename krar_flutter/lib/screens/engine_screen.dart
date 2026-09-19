@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 
 import '../theme/studio_theme.dart';
@@ -12,32 +13,61 @@ class EngineScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final wide = MediaQuery.sizeOf(context).width >= 900;
     final pad = wide ? 48.0 : 20.0;
-    final cards = [
-      const _LayerCard(
-        n: '01',
-        kicker: 'Main thread',
-        title: 'Flutter Web canvas',
-        accent: StudioColors.blue,
-        body: 'Pointer events from up to ten fingers are hit-tested against the strings in StringCanvas. '
-            'Every string a finger touches or crosses becomes a pluck(string, velocity) call.',
-      ),
-      const _LayerCard(
-        n: '02',
-        kicker: 'Audio thread',
-        title: 'AudioWorkletProcessor',
-        accent: StudioColors.saffron,
-        highlight: true,
-        body: 'krar-processor plays 128-frame blocks, 2.67 ms each at 48 kHz. Today it asks the main thread '
-            'for each block over its MessagePort; running the engine inside the worklet is the next step.',
-      ),
-      const _LayerCard(
-        n: '03',
-        kicker: 'WebAssembly',
-        title: 'Rust KrarEngine',
-        accent: StudioColors.terracotta,
-        body: 'Compiled with wasm-bindgen. Owns one string model per voice, the active qenet, and master gain.',
-      ),
-    ];
+    // Web runs the engine as WASM behind an AudioWorklet; iOS runs it natively on CoreAudio.
+    final cards = kIsWeb
+        ? const [
+            _LayerCard(
+              n: '01',
+              kicker: 'Main thread',
+              title: 'Flutter Web canvas',
+              accent: StudioColors.blue,
+              body: 'Pointer events from up to ten fingers are hit-tested against the strings in StringCanvas. '
+                  'Every string a finger touches or crosses becomes a pluck(string, velocity) call.',
+            ),
+            _LayerCard(
+              n: '02',
+              kicker: 'Audio thread',
+              title: 'AudioWorkletProcessor',
+              accent: StudioColors.saffron,
+              highlight: true,
+              body: 'krar-processor plays 128-frame blocks, 2.67 ms each at 48 kHz. Today it asks the main thread '
+                  'for each block over its MessagePort; running the engine inside the worklet is the next step.',
+            ),
+            _LayerCard(
+              n: '03',
+              kicker: 'WebAssembly',
+              title: 'Rust KrarEngine',
+              accent: StudioColors.terracotta,
+              body: 'Compiled with wasm-bindgen. Owns one string model per voice, the active qenet, and master gain.',
+            ),
+          ]
+        : const [
+            _LayerCard(
+              n: '01',
+              kicker: 'UI thread',
+              title: 'Flutter canvas',
+              accent: StudioColors.blue,
+              body: 'Pointer events from up to ten fingers are hit-tested against the strings in StringCanvas. '
+                  'Every string a finger touches or crosses becomes a pluck(string, velocity) call over dart:ffi.',
+            ),
+            _LayerCard(
+              n: '02',
+              kicker: 'Audio thread',
+              title: 'CoreAudio render callback',
+              accent: StudioColors.saffron,
+              highlight: true,
+              body: 'The engine renders straight into CoreAudio on its own real-time thread. It never waits on '
+                  'the UI: if a control call holds the engine, it plays one silent block instead of blocking.',
+            ),
+            _LayerCard(
+              n: '03',
+              kicker: 'Native Rust',
+              title: 'Rust KrarEngine',
+              accent: StudioColors.terracotta,
+              body: 'The same crate as the web build, compiled for iOS into KrarEngine.framework with a small C ABI. '
+                  'Owns one string model per voice, the active qenet, and master gain.',
+            ),
+          ];
     return ListView(
       padding: EdgeInsets.fromLTRB(pad, 36, pad, 40),
       children: [

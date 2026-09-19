@@ -51,7 +51,7 @@ void main() {
     expect(find.text('Play along'), findsOneWidget);
 
     await goTo(tester, 'Engine');
-    expect(find.text('AudioWorkletProcessor'), findsOneWidget);
+    expect(find.text('Rust KrarEngine'), findsOneWidget);
   });
 
   testWidgets('tutor tempo buttons change the tempo', (tester) async {

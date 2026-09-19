@@ -4,6 +4,9 @@ mod karplus_strong;
 mod scale;
 mod string_model;
 
+#[cfg(not(target_arch = "wasm32"))]
+pub mod native;
+
 pub use karplus_strong::KrarEngine;
 pub use scale::{Scale, ScaleType};
 pub use string_model::StringConfig;

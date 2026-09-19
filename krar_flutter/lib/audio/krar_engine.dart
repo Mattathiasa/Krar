@@ -1,98 +1,82 @@
-import 'dart:js_interop';
 import 'dart:typed_data';
 
 import '../models/qenet.dart';
 import '../models/string_config.dart';
-import 'audio_bridge.dart';
+import 'krar_backend.dart';
 
+/// The app's handle on the Rust string engine, whichever platform it runs on.
 class KrarEngine {
-  KrarEngineJS? _engine;
+  KrarEngine({KrarBackend? backend}) : _backend = backend ?? createKrarBackend();
+
+  final KrarBackend _backend;
   bool _isInitialized = false;
 
   /// Begena strings; voice [previewVoice] is reserved for single notes
   /// (scale degrees, tab playback) so they never retune a string.
   static const int stringCount = 5;
   static const int previewVoice = 5;
+  static const int voiceCount = stringCount + 1;
 
   Future<void> initialize() async {
-    await waitForBridge();
-    await initAudioJS();
-    await startAudioJS();
-    _engine = getKrarEngineJS();
-    if (_engine == null) {
-      throw StateError('Audio bridge did not expose its engine');
-    }
+    await _backend.start(voiceCount);
     for (final s in StringConfig.begenaStrings) {
-      _engine!.setStringFrequency(s.id, s.frequency);
+      _backend.setStringFrequency(s.id, s.frequency);
     }
     _isInitialized = true;
   }
 
-  /// Call from a user gesture: browsers start the AudioContext suspended.
+  /// Call from a user gesture: browsers start audio suspended.
   Future<void> resume() async {
-    if (_isInitialized) await resumeAudioJS();
+    if (_isInitialized) await _backend.resume();
   }
 
   void pluck(int stringId, double velocity) {
-    if (!_isInitialized) return;
-    _engine!.pluck(stringId, velocity);
+    if (_isInitialized) _backend.pluck(stringId, velocity);
   }
 
   /// Plays one note at [frequency] on the preview voice.
   void playFrequency(double frequency, {double velocity = 0.8}) {
     if (!_isInitialized) return;
-    _engine!.setStringFrequency(previewVoice, frequency);
-    _engine!.pluck(previewVoice, velocity);
+    _backend.setStringFrequency(previewVoice, frequency);
+    _backend.pluck(previewVoice, velocity);
   }
 
   void release(int stringId) {
-    if (!_isInitialized) return;
-    _engine!.release(stringId);
+    if (_isInitialized) _backend.release(stringId);
   }
 
   void setScale(ScaleType scaleType) {
-    if (!_isInitialized) return;
-    _engine!.setScale(scaleType.index);
+    if (_isInitialized) _backend.setScale(scaleType.index);
   }
 
   /// Output samples for the oscilloscope. Empty before audio starts.
-  Float32List waveform() => _isInitialized ? (getWaveformJS()?.toDart ?? Float32List(0)) : Float32List(0);
+  Float32List waveform() => _isInitialized ? _backend.waveform() : Float32List(0);
 
-  double getStringFrequency(int stringId) {
-    if (!_isInitialized) return 0.0;
-    return _engine!.getStringFrequency(stringId);
-  }
+  double getStringFrequency(int stringId) => _isInitialized ? _backend.getStringFrequency(stringId) : 0.0;
 
   void setStringFrequency(int stringId, double frequency) {
-    if (!_isInitialized) return;
-    _engine!.setStringFrequency(stringId, frequency);
+    if (_isInitialized) _backend.setStringFrequency(stringId, frequency);
   }
 
   void setMasterVolume(double volume) {
-    if (!_isInitialized) return;
-    _engine!.setMasterVolume(volume);
+    if (_isInitialized) _backend.setMasterVolume(volume);
   }
 
-  double getMasterVolume() => _isInitialized ? _engine!.getMasterVolume() : 0.0;
+  double getMasterVolume() => _isInitialized ? _backend.getMasterVolume() : 0.0;
 
   void setReverb(double amount) {
-    if (!_isInitialized) return;
-    _engine!.setReverb(amount);
+    if (_isInitialized) _backend.setReverb(amount);
   }
 
-  double getReverb() => _isInitialized ? _engine!.getReverb() : 0.0;
+  double getReverb() => _isInitialized ? _backend.getReverb() : 0.0;
 
   int get numStrings => stringCount;
 
-  List<double> getStringConfig(int stringId) {
-    if (!_isInitialized) return const [];
-    return _engine!.getStringConfig(stringId).toDart.toList();
-  }
+  List<double> getStringConfig(int stringId) => _isInitialized ? _backend.stringConfig(stringId) : const [];
 
   bool get isInitialized => _isInitialized;
 
   void dispose() {
     _isInitialized = false;
-    _engine = null;
   }
 }

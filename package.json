@@ -5,11 +5,24 @@
   "private": true,
   "scripts": {
     "build:engine": "cd krar_engine && wasm-pack build --target web",
+    "build:engine:ios": "./krar_engine/ios/build-xcframework.sh",
     "build:web": "cd krar_flutter && flutter build web && cp -r ../krar_engine/pkg build/web/pkg",
+    "build:ios": "npm run build:engine:ios && cd krar_flutter && flutter build ios",
+    "build:ios:sim": "npm run build:engine:ios && cd krar_flutter && flutter build ios --simulator --debug",
     "serve": "cd krar_flutter/build/web && python3 -m http.server 8080",
     "dev": "cd krar_flutter && flutter run -d chrome --web-port=8080"
   },
-  "keywords": ["krar", "begena", "ethiopian", "microtonal", "synthesizer", "wasm", "flutter"],
+  "keywords": [
+    "krar",
+    "begena",
+    "ethiopian",
+    "microtonal",
+    "synthesizer",
+    "wasm",
+    "flutter",
+    "ios",
+    "ffi"
+  ],
   "author": "",
   "license": "MIT"
 }

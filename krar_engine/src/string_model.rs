@@ -1,3 +1,5 @@
+use std::sync::atomic::{AtomicU32, Ordering};
+
 use wasm_bindgen::prelude::*;
 
 /// Per-sample envelope decay after a pluck. 0.999 died out in ~60 ms;
@@ -6,6 +8,19 @@ const ENVELOPE_DECAY: f32 = 0.99995;
 
 /// Energy kept on each pass round the delay line (Karplus-Strong loop gain).
 const LOOP_GAIN: f32 = 0.996;
+
+static NOISE_STATE: AtomicU32 = AtomicU32::new(0x9E37_79B9);
+
+/// Uniform noise in [-1, 1) from a xorshift generator, so the pluck burst
+/// works the same in WASM and in native builds.
+fn noise() -> f32 {
+    let mut x = NOISE_STATE.load(Ordering::Relaxed);
+    x ^= x << 13;
+    x ^= x >> 17;
+    x ^= x << 5;
+    NOISE_STATE.store(x, Ordering::Relaxed);
+    (x as f32 / u32::MAX as f32) * 2.0 - 1.0
+}
 
 #[wasm_bindgen]
 pub struct StringConfig {
@@ -105,7 +120,7 @@ impl StringState {
             for (h, &harmonic_amp) in self.harmonics.iter().enumerate() {
                 let harmonic_freq = self.frequency * (h + 1) as f32;
                 let phase = (i as f32 / sample_rate as f32) * harmonic_freq * 2.0 * std::f32::consts::PI;
-                sample += (phase.sin() * harmonic_amp * (js_sys::Math::random() as f32 * 2.0 - 1.0));
+                sample += phase.sin() * harmonic_amp * noise();
             }
             self.buffer[i] = sample * velocity * 0.25;
         }

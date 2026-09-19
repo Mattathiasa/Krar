@@ -1,0 +1,21 @@
+PODS:
+  - Flutter (1.0.0)
+  - KrarEngine (0.1.0)
+
+DEPENDENCIES:
+  - Flutter (from `Flutter`)
+  - KrarEngine (from `../../krar_engine/ios`)
+
+EXTERNAL SOURCES:
+  Flutter:
+    :path: Flutter
+  KrarEngine:
+    :path: "../../krar_engine/ios"
+
+SPEC CHECKSUMS:
+  Flutter: 71a624a5bc0c04062bf19101d501e466baf2fb47
+  KrarEngine: 381915629e0a80bfd5d6e21fe9abab4a5bce8be6
+
+PODFILE CHECKSUM: c0eb23bc6bbe9fcb53b349065f3ef89ffaf930d5
+
+COCOAPODS: 1.17.0
