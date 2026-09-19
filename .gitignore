@@ -5,3 +5,6 @@ krar_flutter/build/
 
 # Built by krar_engine/ios/build-xcframework.sh
 krar_engine/ios/KrarEngine.xcframework/
+
+# Copied in for `npm run dev`
+krar_flutter/web/pkg/
