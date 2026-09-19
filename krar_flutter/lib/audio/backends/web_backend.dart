@@ -27,6 +27,9 @@ class _WebBackend implements KrarBackend {
   void pluck(int string, double velocity) => _engine?.pluck(string, velocity);
 
   @override
+  void strike(int string, double velocity) => _engine?.strike(string, velocity);
+
+  @override
   void release(int string) => _engine?.release(string);
 
   @override

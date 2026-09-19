@@ -145,7 +145,7 @@ class _PlayScreenState extends State<PlayScreen> {
               for (final s in ScaleType.values)
                 Padding(
                   padding: const EdgeInsets.only(right: 8),
-                  child: _ScalePill(scale: s, selected: s == _scale, onTap: () => _setScale(s)),
+                  child: ScalePill(scale: s, selected: s == _scale, onTap: () => _setScale(s)),
                 ),
             ],
           ),
@@ -236,45 +236,6 @@ class _PlayScreenState extends State<PlayScreen> {
         ),
         Slider(value: value, onChanged: onChanged, label: label),
       ],
-    );
-  }
-}
-
-class _ScalePill extends StatelessWidget {
-  const _ScalePill({required this.scale, required this.selected, required this.onTap});
-
-  final ScaleType scale;
-  final bool selected;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Semantics(
-      button: true,
-      selected: selected,
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onTap,
-          customBorder: const StadiumBorder(),
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            constraints: const BoxConstraints(minHeight: 44),
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            alignment: Alignment.center,
-            decoration: ShapeDecoration(
-              color: selected ? scale.hue : StudioColors.surface,
-              shape: StadiumBorder(side: BorderSide(color: selected ? scale.hue : StudioColors.line)),
-            ),
-            child: Text(
-              scale.label,
-              style: StudioText.body(14,
-                  color: selected ? StudioColors.ground : StudioColors.text,
-                  weight: selected ? FontWeight.w600 : FontWeight.w400),
-            ),
-          ),
-        ),
-      ),
     );
   }
 }

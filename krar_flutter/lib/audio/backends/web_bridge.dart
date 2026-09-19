@@ -5,6 +5,7 @@ import 'package:web/web.dart' as web;
 /// member maps to its real export with `@JS`.
 extension type KrarEngineJS._(JSObject _) implements JSObject {
   external void pluck(int stringId, double velocity);
+  external void strike(int stringId, double velocity);
   external void release(int stringId);
   @JS('set_scale')
   external void setScale(int scaleType);

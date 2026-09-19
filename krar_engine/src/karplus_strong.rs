@@ -4,6 +4,8 @@ use std::collections::HashMap;
 use crate::scale::ScaleType;
 use crate::string_model::StringState;
 
+const MIX_GAIN: f32 = 0.35;
+
 #[wasm_bindgen]
 pub struct KrarEngine {
     sample_rate: u32,
@@ -43,6 +45,13 @@ impl KrarEngine {
         }
     }
 
+    /// Sounds a voice with a piano hammer instead of a pluck.
+    pub fn strike(&mut self, string_id: u32, velocity: f32) {
+        if let Some(string) = self.strings.get_mut(string_id as usize) {
+            string.strike(velocity.clamp(0.0, 1.0), self.sample_rate);
+        }
+    }
+
     pub fn release(&mut self, string_id: u32) {
         if let Some(string) = self.strings.get_mut(string_id as usize) {
             string.release();
@@ -67,11 +76,10 @@ impl KrarEngine {
             }
         }
 
-        let num_strings = self.strings.len() as f32;
-        if num_strings > 0.0 {
-            for sample in self.buffer.iter_mut() {
-                *sample = (*sample / num_strings) * self.master_volume;
-            }
+        // Fixed headroom plus a soft clip, rather than dividing by the voice
+        // count, which made everything quieter as voices were added.
+        for sample in self.buffer.iter_mut() {
+            *sample = (*sample * MIX_GAIN * self.master_volume).tanh();
         }
 
         self.buffer.clone()

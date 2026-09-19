@@ -11,11 +11,16 @@ class KrarEngine {
   final KrarBackend _backend;
   bool _isInitialized = false;
 
-  /// Begena strings; voice [previewVoice] is reserved for single notes
-  /// (scale degrees, tab playback) so they never retune a string.
+  /// Voice layout: the begena strings, one preview voice for single notes
+  /// (scale degrees, tab playback) so they never retune a string, then a
+  /// pool of piano voices. web/js/krar_wasm_bridge.js uses the same count.
   static const int stringCount = 5;
   static const int previewVoice = 5;
-  static const int voiceCount = stringCount + 1;
+  static const int firstPianoVoice = 6;
+  static const int pianoVoiceCount = 8;
+  static const int voiceCount = firstPianoVoice + pianoVoiceCount;
+
+  int _nextPianoVoice = 0;
 
   Future<void> initialize() async {
     await _backend.start(voiceCount);
@@ -39,6 +44,16 @@ class KrarEngine {
     if (!_isInitialized) return;
     _backend.setStringFrequency(previewVoice, frequency);
     _backend.pluck(previewVoice, velocity);
+  }
+
+  /// Strikes a piano note at [frequency], taking the next voice in the pool
+  /// so up to [pianoVoiceCount] notes ring at once.
+  void playPiano(double frequency, {double velocity = 0.8}) {
+    if (!_isInitialized) return;
+    final voice = firstPianoVoice + _nextPianoVoice;
+    _nextPianoVoice = (_nextPianoVoice + 1) % pianoVoiceCount;
+    _backend.setStringFrequency(voice, frequency);
+    _backend.strike(voice, velocity);
   }
 
   void release(int stringId) {

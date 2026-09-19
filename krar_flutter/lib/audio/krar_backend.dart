@@ -14,6 +14,9 @@ abstract class KrarBackend {
   Future<void> resume();
 
   void pluck(int string, double velocity);
+
+  /// Sounds a voice with a piano hammer instead of a pluck.
+  void strike(int string, double velocity);
   void release(int string);
   void setScale(int scaleIndex);
   void setStringFrequency(int string, double frequency);

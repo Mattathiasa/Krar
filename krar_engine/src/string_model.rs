@@ -9,6 +9,15 @@ const ENVELOPE_DECAY: f32 = 0.99995;
 /// Energy kept on each pass round the delay line (Karplus-Strong loop gain).
 const LOOP_GAIN: f32 = 0.996;
 
+/// A piano string sustains far longer than gut on a lyre.
+const PIANO_ENVELOPE_DECAY: f32 = 0.99998;
+const PIANO_LOOP_GAIN: f32 = 0.9985;
+
+/// Where the hammer meets the string, and how wide the felt is, as fractions
+/// of the string length. Striking near one end is what gives a piano its tone.
+const HAMMER_POSITION: f32 = 0.12;
+const HAMMER_WIDTH: f32 = 0.10;
+
 static NOISE_STATE: AtomicU32 = AtomicU32::new(0x9E37_79B9);
 
 /// Uniform noise in [-1, 1) from a xorshift generator, so the pluck burst
@@ -84,6 +93,7 @@ pub struct StringState {
     buffer: Vec<f32>,
     buffer_index: usize,
     pub decay: f32,
+    loop_gain: f32,
     pub phase: f32,
     harmonics: Vec<f32>,
     harmonic_damping: Vec<f32>,
@@ -102,6 +112,7 @@ impl StringState {
             buffer: vec![0.0; 1024],
             buffer_index: 0,
             decay: ENVELOPE_DECAY,
+            loop_gain: LOOP_GAIN,
             phase: 0.0,
             harmonics,
             harmonic_damping,
@@ -127,6 +138,38 @@ impl StringState {
 
         self.buffer_index = 0;
         self.decay = ENVELOPE_DECAY;
+        self.loop_gain = LOOP_GAIN;
+    }
+
+    /// Strikes the string like a piano hammer: a smooth felt-shaped bump near
+    /// one end, with a little noise for the attack, instead of a pluck.
+    pub fn strike(&mut self, velocity: f32, sample_rate: u32) {
+        self.velocity = velocity;
+        self.is_plucked = true;
+
+        let n = ((sample_rate as f32 / self.frequency) as usize).max(2);
+        self.buffer.resize(n, 0.0);
+
+        for i in 0..n {
+            let d = (i as f32 / n as f32 - HAMMER_POSITION) / HAMMER_WIDTH;
+            let bump = if d.abs() < 1.0 {
+                0.5 * (1.0 + (std::f32::consts::PI * d).cos())
+            } else {
+                0.0
+            };
+            // Harder strikes are brighter: more noise in the attack.
+            self.buffer[i] = (bump * 0.85 + noise() * 0.15 * velocity) * velocity * 0.6;
+        }
+
+        // Karplus-Strong keeps any DC offset forever, so remove it.
+        let mean = self.buffer.iter().sum::<f32>() / n as f32;
+        for s in self.buffer.iter_mut() {
+            *s -= mean;
+        }
+
+        self.buffer_index = 0;
+        self.decay = PIANO_ENVELOPE_DECAY;
+        self.loop_gain = PIANO_LOOP_GAIN;
     }
 
     pub fn release(&mut self) {
@@ -152,7 +195,7 @@ impl StringState {
             let next_sample = self.buffer[next_index];
 
             let averaged = (current_sample + next_sample) * 0.5;
-            let filtered = averaged * LOOP_GAIN;
+            let filtered = averaged * self.loop_gain;
 
             self.buffer[self.buffer_index] = filtered;
 

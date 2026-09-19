@@ -4,6 +4,7 @@ import '../audio/krar_engine.dart';
 import '../theme/studio_theme.dart';
 import '../widgets/studio_widgets.dart';
 import 'engine_screen.dart';
+import 'piano_screen.dart';
 import 'play_screen.dart';
 import 'scales_screen.dart';
 import 'tutor_screen.dart';
@@ -20,6 +21,7 @@ class _Section {
 
 const _sections = [
   _Section('Play', 'Play', Icons.music_note_outlined, 'Begena · 5 strings'),
+  _Section('Piano', 'Piano', Icons.piano, 'Piano · 8 voices'),
   _Section('Scales', 'Scales', Icons.linear_scale, null),
   _Section('Tab Tutor', 'Tutor', Icons.school_outlined, 'Krar · 6 strings'),
   _Section('Engine', 'Engine', Icons.memory_outlined, null),
@@ -71,6 +73,7 @@ class _AppShellState extends State<AppShell> {
     final wide = MediaQuery.sizeOf(context).width >= 900;
     final pages = [
       PlayScreen(engine: _engine),
+      PianoScreen(engine: _engine),
       ScalesScreen(engine: _engine),
       TutorScreen(engine: _engine),
       const EngineScreen(),

@@ -111,6 +111,11 @@ pub extern "C" fn krar_pluck(string_id: u32, velocity: f32) {
 }
 
 #[no_mangle]
+pub extern "C" fn krar_strike(string_id: u32, velocity: f32) {
+    with_engine((), |s| s.engine.strike(string_id, velocity));
+}
+
+#[no_mangle]
 pub extern "C" fn krar_release(string_id: u32) {
     with_engine((), |s| s.engine.release(string_id));
 }

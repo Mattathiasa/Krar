@@ -31,6 +31,7 @@ class _NativeBackend implements KrarBackend {
   static const _waveLen = 1024;
 
   late final _U32F32Dart _pluck;
+  late final _U32F32Dart _strike;
   late final _U32Dart _release;
   late final _U32Dart _setScale;
   late final _U32F32Dart _setFrequency;
@@ -53,6 +54,7 @@ class _NativeBackend implements KrarBackend {
     final lib = DynamicLibrary.open('KrarEngine.framework/KrarEngine');
 
     _pluck = lib.lookupFunction<_U32F32C, _U32F32Dart>('krar_pluck');
+    _strike = lib.lookupFunction<_U32F32C, _U32F32Dart>('krar_strike');
     _release = lib.lookupFunction<_U32C, _U32Dart>('krar_release');
     _setScale = lib.lookupFunction<_U32C, _U32Dart>('krar_set_scale');
     _setFrequency = lib.lookupFunction<_U32F32C, _U32F32Dart>('krar_set_string_frequency');
@@ -78,6 +80,11 @@ class _NativeBackend implements KrarBackend {
   @override
   void pluck(int string, double velocity) {
     if (_ready) _pluck(string, velocity);
+  }
+
+  @override
+  void strike(int string, double velocity) {
+    if (_ready) _strike(string, velocity);
   }
 
   @override

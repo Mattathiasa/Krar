@@ -15,6 +15,9 @@ class _UnsupportedBackend implements KrarBackend {
   void pluck(int string, double velocity) {}
 
   @override
+  void strike(int string, double velocity) {}
+
+  @override
   void release(int string) {}
 
   @override

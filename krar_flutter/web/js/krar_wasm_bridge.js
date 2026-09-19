@@ -6,8 +6,9 @@ let audioWorkletNode = null;
 let analyser = null;
 let waveform = null;
 
-// 5 begena strings plus one preview voice for scale degrees and tab playback.
-const NUM_VOICES = 6;
+// 5 begena strings, one preview voice for scale degrees and tab playback,
+// and 8 piano voices. Matches KrarEngine.voiceCount in Dart.
+const NUM_VOICES = 14;
 let isStarted = false;
 
 export async function initAudio() {
