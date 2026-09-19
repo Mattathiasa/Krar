@@ -1,5 +1,12 @@
 use wasm_bindgen::prelude::*;
 
+/// Per-sample envelope decay after a pluck. 0.999 died out in ~60 ms;
+/// this lets a string ring for a few seconds like gut on a lyre.
+const ENVELOPE_DECAY: f32 = 0.99995;
+
+/// Energy kept on each pass round the delay line (Karplus-Strong loop gain).
+const LOOP_GAIN: f32 = 0.996;
+
 #[wasm_bindgen]
 pub struct StringConfig {
     id: u32,
@@ -79,7 +86,7 @@ impl StringState {
             is_plucked: false,
             buffer: vec![0.0; 1024],
             buffer_index: 0,
-            decay: 0.999,
+            decay: ENVELOPE_DECAY,
             phase: 0.0,
             harmonics,
             harmonic_damping,
@@ -104,7 +111,7 @@ impl StringState {
         }
 
         self.buffer_index = 0;
-        self.decay = 0.999;
+        self.decay = ENVELOPE_DECAY;
     }
 
     pub fn release(&mut self) {
@@ -130,7 +137,7 @@ impl StringState {
             let next_sample = self.buffer[next_index];
 
             let averaged = (current_sample + next_sample) * 0.5;
-            let filtered = averaged * 0.97;
+            let filtered = averaged * LOOP_GAIN;
 
             self.buffer[self.buffer_index] = filtered;
 

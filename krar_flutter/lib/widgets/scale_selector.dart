@@ -1,165 +1,93 @@
 import 'package:flutter/material.dart';
 
-enum ScaleType {
-  tizitaMinor,
-  tizitaMajor,
-  ambassel,
-  bati,
-}
+import '../models/qenet.dart';
+import '../theme/studio_theme.dart';
 
-extension ScaleTypeExtension on ScaleType {
-  String get label {
-    switch (this) {
-      case ScaleType.tizitaMinor:
-        return 'Tizita Minor';
-      case ScaleType.tizitaMajor:
-        return 'Tizita Major';
-      case ScaleType.ambassel:
-        return 'Ambassel';
-      case ScaleType.bati:
-        return 'Bati';
-    }
-  }
+export '../models/qenet.dart';
 
-  String get description {
-    switch (this) {
-      case ScaleType.tizitaMinor:
-        return 'Traditional Ethiopian minor scale';
-      case ScaleType.tizitaMajor:
-        return 'Major variant of Tizita';
-      case ScaleType.ambassel:
-        return 'Melancholic Ethiopian scale';
-      case ScaleType.bati:
-        return 'Bright Ethiopian scale';
-    }
-  }
+/// Two-by-two grid of the four qenet. The selected one fills with its hue.
+class ScaleSelector extends StatelessWidget {
+  const ScaleSelector({super.key, required this.selected, required this.onScaleChanged});
 
-  List<double> get intervals {
-    switch (this) {
-      case ScaleType.tizitaMinor:
-        return [1.0, 1.189, 1.261, 1.337, 1.417, 1.500, 1.587, 1.682];
-      case ScaleType.tizitaMajor:
-        return [1.0, 1.189, 1.261, 1.337, 1.417, 1.500, 1.587, 1.682];
-      case ScaleType.ambassel:
-        return [1.0, 1.107, 1.199, 1.337, 1.417, 1.500, 1.587, 1.682];
-      case ScaleType.bati:
-        return [1.0, 1.107, 1.199, 1.337, 1.417, 1.500, 1.587, 1.682];
-    }
-  }
-}
-
-class ScaleSelector extends StatefulWidget {
-  final Function(ScaleType) onScaleChanged;
-  final ScaleType initialScale;
-
-  const ScaleSelector({
-    super.key,
-    required this.onScaleChanged,
-    this.initialScale = ScaleType.tizitaMinor,
-  });
-
-  @override
-  State<ScaleSelector> createState() => _ScaleSelectorState();
-}
-
-class _ScaleSelectorState extends State<ScaleSelector> {
-  late ScaleType _selectedScale;
-
-  @override
-  void initState() {
-    super.initState();
-    _selectedScale = widget.initialScale;
-  }
+  final ScaleType selected;
+  final ValueChanged<ScaleType> onScaleChanged;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
-      decoration: BoxDecoration(
-        color: const Color(0xFF16213E),
-        border: Border(
-          bottom: BorderSide(
-            color: const Color(0xFF0F3460),
-            width: 1.0,
-          ),
-        ),
+    return GridView(
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        mainAxisSpacing: 8,
+        crossAxisSpacing: 8,
+        mainAxisExtent: 76,
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Scale',
-            style: TextStyle(
-              color: Colors.white.withAlpha(200),
-              fontSize: 12.0,
-              fontWeight: FontWeight.w500,
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      children: [for (final s in ScaleType.values) _QenetButton(scale: s, selected: s == selected, onTap: () => onScaleChanged(s))],
+    );
+  }
+}
+
+class _QenetButton extends StatelessWidget {
+  const _QenetButton({required this.scale, required this.selected, required this.onTap});
+
+  final ScaleType scale;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final fg = selected ? StudioColors.ground : StudioColors.text;
+    return Semantics(
+      button: true,
+      selected: selected,
+      label: '${scale.label}, ${scale.short}',
+      child: AnimatedSlide(
+        duration: const Duration(milliseconds: 200),
+        offset: selected ? const Offset(0, -0.03) : Offset.zero,
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: onTap,
+            borderRadius: BorderRadius.circular(12),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              padding: const EdgeInsets.symmetric(horizontal: 14),
+              decoration: BoxDecoration(
+                color: selected ? scale.hue : StudioColors.surfaceRaised,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: selected ? scale.hue : StudioColors.line),
+                boxShadow: selected ? [BoxShadow(color: scale.hue.withValues(alpha: 0.3), blurRadius: 16)] : null,
+              ),
+              child: ExcludeSemantics(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.baseline,
+                      textBaseline: TextBaseline.alphabetic,
+                      children: [
+                        Expanded(
+                          child: Text(scale.label,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: StudioText.body(15, color: fg, weight: FontWeight.w600)),
+                        ),
+                        Text(scale.geez, style: StudioText.geez(13, color: fg.withValues(alpha: 0.85))),
+                      ],
+                    ),
+                    const SizedBox(height: 2),
+                    Text(scale.short,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: StudioText.body(12, color: fg.withValues(alpha: 0.8))),
+                  ],
+                ),
+              ),
             ),
           ),
-          const SizedBox(height: 8.0),
-          Row(
-            children: ScaleType.values.map((scale) {
-              final isSelected = scale == _selectedScale;
-              return Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                  child: GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _selectedScale = scale;
-                      });
-                      widget.onScaleChanged(scale);
-                    },
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 10.0,
-                        horizontal: 8.0,
-                      ),
-                      decoration: BoxDecoration(
-                        color: isSelected
-                            ? const Color(0xFFE94560)
-                            : const Color(0xFF0F3460),
-                        borderRadius: BorderRadius.circular(8.0),
-                        border: Border.all(
-                          color: isSelected
-                              ? const Color(0xFFE94560)
-                              : const Color(0xFF1A1A2E),
-                          width: 1.0,
-                        ),
-                      ),
-                      child: Column(
-                        children: [
-                          Text(
-                            scale.label,
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 11.0,
-                              fontWeight: isSelected
-                                  ? FontWeight.w600
-                                  : FontWeight.w400,
-                            ),
-                          ),
-                          if (isSelected) ...[
-                            const SizedBox(height: 4.0),
-                            Text(
-                              scale.description,
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                color: Colors.white.withAlpha(180),
-                                fontSize: 9.0,
-                              ),
-                            ),
-                          ],
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              );
-            }).toList(),
-          ),
-        ],
+        ),
       ),
     );
   }

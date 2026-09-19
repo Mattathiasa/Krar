@@ -18,7 +18,7 @@ class _TabEditorScreenState extends State<TabEditorScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0A0A1A),
+      backgroundColor: const Color(0xFF15120E),
       appBar: AppBar(
         title: const Text(
           'Tab Editor',
@@ -27,7 +27,7 @@ class _TabEditorScreenState extends State<TabEditorScreen> {
             letterSpacing: 0.5,
           ),
         ),
-        backgroundColor: const Color(0xFF16213E),
+        backgroundColor: const Color(0xFF1F1A15),
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
@@ -72,10 +72,10 @@ class _TabEditorScreenState extends State<TabEditorScreen> {
     return Container(
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
-        color: const Color(0xFF16213E),
+        color: const Color(0xFF1F1A15),
         borderRadius: BorderRadius.circular(12.0),
         border: Border.all(
-          color: const Color(0xFF0F3460),
+          color: const Color(0xFF3B3229),
           width: 1.0,
         ),
       ),
@@ -93,7 +93,7 @@ class _TabEditorScreenState extends State<TabEditorScreen> {
           IconButton(
             icon: const Icon(
               Icons.play_arrow,
-              color: Color(0xFFE94560),
+              color: Color(0xFFE8B04A),
               size: 32.0,
             ),
             onPressed: () {},

@@ -37,10 +37,10 @@ class _TabEditorState extends State<TabEditor> {
     return Container(
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
-        color: const Color(0xFF1A1A2E),
+        color: const Color(0xFF1A1511),
         borderRadius: BorderRadius.circular(12.0),
         border: Border.all(
-          color: const Color(0xFF0F3460),
+          color: const Color(0xFF3B3229),
           width: 1.0,
         ),
       ),
@@ -51,7 +51,7 @@ class _TabEditorState extends State<TabEditor> {
             children: [
               const Icon(
                 Icons.tab,
-                color: Color(0xFFE94560),
+                color: Color(0xFFE8B04A),
                 size: 20.0,
               ),
               const SizedBox(width: 8.0),
@@ -136,13 +136,13 @@ class _TabEditorState extends State<TabEditor> {
               margin: const EdgeInsets.all(2.0),
               decoration: BoxDecoration(
                 color: isSelected
-                    ? const Color(0xFFE94560).withAlpha(50)
-                    : const Color(0xFF0F3460),
+                    ? const Color(0xFFE8B04A).withAlpha(50)
+                    : const Color(0xFF3B3229),
                 borderRadius: BorderRadius.circular(4.0),
                 border: Border.all(
                   color: isSelected
-                      ? const Color(0xFFE94560)
-                      : const Color(0xFF1A1A2E),
+                      ? const Color(0xFFE8B04A)
+                      : const Color(0xFF1A1511),
                   width: 1.0,
                 ),
               ),
@@ -184,10 +184,10 @@ class _TabEditorState extends State<TabEditor> {
                 width: 32.0,
                 height: 32.0,
                 decoration: BoxDecoration(
-                  color: const Color(0xFF0F3460),
+                  color: const Color(0xFF3B3229),
                   borderRadius: BorderRadius.circular(6.0),
                   border: Border.all(
-                    color: const Color(0xFF1A1A2E),
+                    color: const Color(0xFF1A1511),
                     width: 1.0,
                   ),
                 ),

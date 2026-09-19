@@ -3,6 +3,11 @@ import init, { KrarEngine } from '../pkg/krar_engine.js';
 let engine = null;
 let audioContext = null;
 let audioWorkletNode = null;
+let analyser = null;
+let waveform = null;
+
+// 5 begena strings plus one preview voice for scale degrees and tab playback.
+const NUM_VOICES = 6;
 let isStarted = false;
 
 export async function initAudio() {
@@ -31,7 +36,8 @@ export async function startAudio() {
       outputChannelCount: [2],
     });
 
-    engine = new KrarEngine(48000, 5);
+    // Rust `new` is a static factory, not a wasm-bindgen constructor.
+    engine = KrarEngine.new(48000, NUM_VOICES);
 
     audioWorkletNode.port.onmessage = (event) => {
       if (event.data.type === 'getBuffer') {
@@ -43,7 +49,11 @@ export async function startAudio() {
       }
     };
 
-    audioWorkletNode.connect(audioContext.destination);
+    analyser = audioContext.createAnalyser();
+    analyser.fftSize = 1024;
+    waveform = new Float32Array(analyser.fftSize);
+    audioWorkletNode.connect(analyser);
+    analyser.connect(audioContext.destination);
     isStarted = true;
     console.log('Audio started');
   } catch (error) {
@@ -62,6 +72,7 @@ export async function stopAudio() {
     audioContext = null;
   }
   engine = null;
+  analyser = null;
   isStarted = false;
   console.log('Audio stopped');
 }
@@ -70,8 +81,30 @@ export function isAudioStarted() {
   return isStarted;
 }
 
+// The engine that feeds the worklet. Dart must pluck this instance, not a new one.
+export function getKrarEngine() {
+  return engine;
+}
+
+// Browsers keep an AudioContext suspended until a user gesture.
+export async function resumeAudio() {
+  if (audioContext && audioContext.state === 'suspended') {
+    await audioContext.resume();
+  }
+}
+
+// Latest output samples, for the on-screen oscilloscope.
+export function getWaveform() {
+  if (!analyser) return null;
+  analyser.getFloatTimeDomainData(waveform);
+  return waveform;
+}
+
 window.KrarEngine = KrarEngine;
 window.initAudio = initAudio;
 window.startAudio = startAudio;
 window.stopAudio = stopAudio;
 window.isAudioStarted = isAudioStarted;
+window.getKrarEngine = getKrarEngine;
+window.resumeAudio = resumeAudio;
+window.getWaveform = getWaveform;

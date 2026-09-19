@@ -1,92 +1,92 @@
 import 'dart:js_interop';
+import 'dart:typed_data';
+
+import '../models/qenet.dart';
+import '../models/string_config.dart';
 import 'audio_bridge.dart';
-import '../widgets/scale_selector.dart';
 
 class KrarEngine {
   KrarEngineJS? _engine;
   bool _isInitialized = false;
-  final int _sampleRate = 48000;
-  final int _numStrings = 5;
+
+  /// Begena strings; voice [previewVoice] is reserved for single notes
+  /// (scale degrees, tab playback) so they never retune a string.
+  static const int stringCount = 5;
+  static const int previewVoice = 5;
 
   Future<void> initialize() async {
-    try {
-      await initAudioJS();
-      await startAudioJS();
-      _engine = KrarEngineJS(_sampleRate, _numStrings);
-      _isInitialized = true;
-    } catch (e) {
-      rethrow;
+    await waitForBridge();
+    await initAudioJS();
+    await startAudioJS();
+    _engine = getKrarEngineJS();
+    if (_engine == null) {
+      throw StateError('Audio bridge did not expose its engine');
     }
+    for (final s in StringConfig.begenaStrings) {
+      _engine!.setStringFrequency(s.id, s.frequency);
+    }
+    _isInitialized = true;
+  }
+
+  /// Call from a user gesture: browsers start the AudioContext suspended.
+  Future<void> resume() async {
+    if (_isInitialized) await resumeAudioJS();
   }
 
   void pluck(int stringId, double velocity) {
-    if (!_isInitialized || _engine == null) return;
+    if (!_isInitialized) return;
     _engine!.pluck(stringId, velocity);
   }
 
+  /// Plays one note at [frequency] on the preview voice.
+  void playFrequency(double frequency, {double velocity = 0.8}) {
+    if (!_isInitialized) return;
+    _engine!.setStringFrequency(previewVoice, frequency);
+    _engine!.pluck(previewVoice, velocity);
+  }
+
   void release(int stringId) {
-    if (!_isInitialized || _engine == null) return;
+    if (!_isInitialized) return;
     _engine!.release(stringId);
   }
 
   void setScale(ScaleType scaleType) {
-    if (!_isInitialized || _engine == null) return;
+    if (!_isInitialized) return;
     _engine!.setScale(scaleType.index);
   }
 
-  List<double> getAudioBuffer() {
-    if (!_isInitialized || _engine == null) return [];
-    final jsArray = _engine!.getAudioBuffer();
-    final dartList = <double>[];
-    for (var i = 0; i < jsArray.length; i++) {
-      dartList.add((jsArray[i] as JSNumber).toDartDouble);
-    }
-    return dartList;
-  }
+  /// Output samples for the oscilloscope. Empty before audio starts.
+  Float32List waveform() => _isInitialized ? (getWaveformJS()?.toDart ?? Float32List(0)) : Float32List(0);
 
   double getStringFrequency(int stringId) {
-    if (!_isInitialized || _engine == null) return 0.0;
+    if (!_isInitialized) return 0.0;
     return _engine!.getStringFrequency(stringId);
   }
 
   void setStringFrequency(int stringId, double frequency) {
-    if (!_isInitialized || _engine == null) return;
+    if (!_isInitialized) return;
     _engine!.setStringFrequency(stringId, frequency);
   }
 
   void setMasterVolume(double volume) {
-    if (!_isInitialized || _engine == null) return;
+    if (!_isInitialized) return;
     _engine!.setMasterVolume(volume);
   }
 
-  double getMasterVolume() {
-    if (!_isInitialized || _engine == null) return 0.0;
-    return _engine!.getMasterVolume();
-  }
+  double getMasterVolume() => _isInitialized ? _engine!.getMasterVolume() : 0.0;
 
   void setReverb(double amount) {
-    if (!_isInitialized || _engine == null) return;
+    if (!_isInitialized) return;
     _engine!.setReverb(amount);
   }
 
-  double getReverb() {
-    if (!_isInitialized || _engine == null) return 0.0;
-    return _engine!.getReverb();
-  }
+  double getReverb() => _isInitialized ? _engine!.getReverb() : 0.0;
 
-  int get numStrings {
-    if (!_isInitialized || _engine == null) return 0;
-    return _engine!.numStrings();
-  }
+  int get numStrings => stringCount;
 
   List<double> getStringConfig(int stringId) {
-    if (!_isInitialized || _engine == null) return [];
-    final jsArray = _engine!.getStringConfig(stringId);
-    final dartList = <double>[];
-    for (var i = 0; i < jsArray.length; i++) {
-      dartList.add((jsArray[i] as JSNumber).toDartDouble);
-    }
-    return dartList;
+    if (!_isInitialized) return const [];
+    return _engine!.getStringConfig(stringId).toDart.toList();
   }
 
   bool get isInitialized => _isInitialized;
