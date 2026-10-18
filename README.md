@@ -230,4 +230,4 @@ canvas's runtime, so they do not render as standalone HTML. See
 
 ## License
 
-MIT, as declared in `package.json`. No `LICENSE` file has been added yet.
+MIT. See `LICENSE`.
