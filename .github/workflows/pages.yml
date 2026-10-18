@@ -48,15 +48,16 @@ jobs:
           channel: stable
           cache: true
 
+      # Fail fast on problems before the slow web build.
+      - name: Check the app for problems
+        run: cd krar_flutter && flutter analyze && flutter test
+
       - name: Build the Flutter web app
         # The app is served from /<repo>/app/, so it needs a matching base href.
         run: |
           cd krar_flutter
           flutter pub get
           flutter build web --release --base-href "/${GITHUB_REPOSITORY#*/}/app/"
-
-      - name: Check the app for problems
-        run: cd krar_flutter && flutter analyze && flutter test
 
       - name: Assemble the site
         run: |
