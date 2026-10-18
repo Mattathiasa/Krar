@@ -9,7 +9,7 @@ pub mod native;
 
 pub use karplus_strong::KrarEngine;
 pub use scale::{Scale, ScaleType};
-pub use string_model::StringConfig;
+pub use string_model::{StringConfig, StringState};
 
 #[wasm_bindgen]
 pub fn create_engine(sample_rate: u32, num_strings: u32) -> KrarEngine {
