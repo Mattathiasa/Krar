@@ -1,10 +1,10 @@
 // Runs the WASM string engine on the audio thread, so a busy UI can no
 // longer interrupt the sound. The main thread only sends control messages
-// and hands over the engine class (already initialised by the bridge, which
-// is the one place that can fetch the wasm); it never waits for a buffer.
+// (and the voice count at construction); it never waits for a buffer.
+
+import init, { KrarEngine } from '../pkg/krar_engine.js';
 
 let engine = null;
-let EngineClass = null;
 let pending = [];
 
 function handleMessage(msg) {
@@ -38,29 +38,41 @@ class KrarProcessor extends AudioWorkletProcessor {
   constructor(options) {
     super();
     const processorOptions = options?.processorOptions ?? {};
-    EngineClass = processorOptions.engine;
     const voices = processorOptions.voices ?? 0;
 
-    if (typeof EngineClass !== 'function' || !voices) {
-      throw new Error('krar-processor needs processorOptions.engine and processorOptions.voices');
-    }
-
-    // Rust `new` is a static factory, not a wasm-bindgen constructor.
-    // `sampleRate` is this worklet's own rate, so the delay lines are cut
-    // for the hardware we actually got, whatever it is.
-    engine = EngineClass.new(sampleRate, voices);
-    if (engine.num_strings() !== voices) {
-      throw new Error(`engine came up with ${engine.num_strings()} voices, expected ${voices}`);
+    if (!voices) {
+      throw new Error('krar-processor needs processorOptions.voices');
     }
 
     this.port.onmessage = (event) => handleMessage(event.data);
+    this._ready = this._setup(voices);
+  }
 
-    for (const msg of pending) handleMessage(msg);
+  async _setup(voices) {
+    await init();
+    // Rust `new` is a static factory, not a wasm-bindgen constructor.
+    // `sampleRate` is this worklet's own rate, so the delay lines are cut
+    // for the hardware we actually got, whatever it is.
+    engine = KrarEngine.new(sampleRate, voices);
+    if (engine.num_strings() !== voices) {
+      throw new Error(
+        `engine came up with ${engine.num_strings()} voices, expected ${voices}`,
+      );
+    }
+    const queued = pending;
     pending = [];
+    for (const msg of queued) handleMessage(msg);
   }
 
   process(_inputs, outputs) {
     const output = outputs[0];
+    if (!engine) {
+      // Still compiling the wasm; output silence until it is ready.
+      for (let channel = 0; channel < output.length; channel++) {
+        output[channel].fill(0);
+      }
+      return true;
+    }
     const block = engine.get_audio_buffer();
     for (let channel = 0; channel < output.length; channel++) {
       output[channel].set(block);

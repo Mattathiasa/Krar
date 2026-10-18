@@ -1,4 +1,4 @@
-import init, { KrarEngine } from '../pkg/krar_engine.js';
+import init from '../pkg/krar_engine.js';
 
 let audioContext = null;
 let audioWorkletNode = null;
@@ -8,9 +8,9 @@ let isStarted = false;
 
 export async function initAudio() {
   try {
-    // One wasm instance for the page. The worklet gets the initialised
-    // KrarEngine class through processorOptions; it cannot fetch the wasm
-    // itself, since AudioWorklet globals have no reliable fetch/import.
+    // The worklet compiles its own copy of the engine from here; the glue
+    // fetches the wasm relative to this module, so no plumbing is needed.
+    // This warms the main-thread copy so the first pluck is not late.
     await init();
     console.log('WASM module initialized');
   } catch (error) {
@@ -35,7 +35,7 @@ export async function startAudio(voices) {
       numberOfInputs: 0,
       numberOfOutputs: 1,
       outputChannelCount: [2],
-      processorOptions: { engine: KrarEngine, voices },
+      processorOptions: { voices },
     });
 
     analyser = audioContext.createAnalyser();
