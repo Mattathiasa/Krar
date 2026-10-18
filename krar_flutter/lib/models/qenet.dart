@@ -53,12 +53,7 @@ extension ScaleTypeExtension on ScaleType {
         ScaleType.bati => const [0, 182, 316, 498, 678, 884, 1018, 1136],
       };
 
-  List<double> get intervals => switch (this) {
-        ScaleType.tizitaMinor || ScaleType.tizitaMajor => const [1.0, 1.189, 1.261, 1.337, 1.417, 1.500, 1.587, 1.682],
-        ScaleType.ambassel || ScaleType.bati => const [1.0, 1.107, 1.199, 1.337, 1.417, 1.500, 1.587, 1.682],
-      };
-
-  /// Frequency of [degree] above [root], from the cent table.
+  /// Frequency of [degree] above [root], derived from the cent table.
   double frequency(double root, int degree) => root * pow(2, cents[degree] / 1200).toDouble();
 }
 
