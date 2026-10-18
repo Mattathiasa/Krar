@@ -1,6 +1,5 @@
 import init, { KrarEngine } from '../pkg/krar_engine.js';
 
-let engine = null;
 let audioContext = null;
 let audioWorkletNode = null;
 let analyser = null;
@@ -9,6 +8,9 @@ let isStarted = false;
 
 export async function initAudio() {
   try {
+    // One wasm instance for the page. The worklet gets the initialised
+    // KrarEngine class through processorOptions; it cannot fetch the wasm
+    // itself, since AudioWorklet globals have no reliable fetch/import.
     await init();
     console.log('WASM module initialized');
   } catch (error) {
@@ -22,8 +24,9 @@ export async function startAudio(voices) {
   try {
     if (isStarted) return;
 
-    // No forced rate: whatever the device gives us, the engine is built to
-    // match, so pitch stays correct on hardware that won't do 48 kHz.
+    // No forced rate: the engine is built inside the worklet at that
+    // worklet's own sampleRate, so pitch stays correct on hardware that
+    // will not do 48 kHz.
     audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
     await audioContext.audioWorklet.addModule('js/audio_processor.js');
@@ -32,23 +35,8 @@ export async function startAudio(voices) {
       numberOfInputs: 0,
       numberOfOutputs: 1,
       outputChannelCount: [2],
+      processorOptions: { engine: KrarEngine, voices },
     });
-
-    // Rust `new` is a static factory, not a wasm-bindgen constructor.
-    engine = KrarEngine.new(audioContext.sampleRate, voices);
-    if (engine.num_strings() !== voices) {
-      throw new Error(`engine created ${engine.num_strings()} voices, expected ${voices}`);
-    }
-
-    audioWorkletNode.port.onmessage = (event) => {
-      if (event.data.type === 'getBuffer') {
-        const buffer = engine.get_audio_buffer();
-        audioWorkletNode.port.postMessage({
-          type: 'buffer',
-          buffer: buffer,
-        });
-      }
-    };
 
     analyser = audioContext.createAnalyser();
     analyser.fftSize = 1024;
@@ -72,7 +60,6 @@ export async function stopAudio() {
     await audioContext.close();
     audioContext = null;
   }
-  engine = null;
   analyser = null;
   isStarted = false;
   console.log('Audio stopped');
@@ -82,9 +69,34 @@ export function isAudioStarted() {
   return isStarted;
 }
 
-// The engine that feeds the worklet. Dart must pluck this instance, not a new one.
-export function getKrarEngine() {
-  return engine;
+function post(msg) {
+  if (audioWorkletNode) audioWorkletNode.port.postMessage(msg);
+}
+
+// Control messages into the worklet. The engine lives there; these are the
+// only way the main thread talks to it.
+export function pluckVoice(string, velocity) {
+  post({ type: 'pluck', string, velocity });
+}
+
+export function strikeVoice(string, velocity) {
+  post({ type: 'strike', string, velocity });
+}
+
+export function releaseVoice(string) {
+  post({ type: 'release', string });
+}
+
+export function setVoiceFrequency(string, frequency) {
+  post({ type: 'setFrequency', string, frequency });
+}
+
+export function setMasterVolume(volume) {
+  post({ type: 'setVolume', volume });
+}
+
+export function setReverb(amount) {
+  post({ type: 'setReverb', amount });
 }
 
 // Browsers keep an AudioContext suspended until a user gesture.
@@ -94,18 +106,23 @@ export async function resumeAudio() {
   }
 }
 
-// Latest output samples, for the on-screen oscilloscope.
+// Latest output samples, for the on-screen oscilloscope. The AnalyserNode
+// sits on the main thread, so this stays a cheap synchronous read.
 export function getWaveform() {
   if (!analyser) return null;
   analyser.getFloatTimeDomainData(waveform);
   return waveform;
 }
 
-window.KrarEngine = KrarEngine;
 window.initAudio = initAudio;
 window.startAudio = startAudio;
 window.stopAudio = stopAudio;
 window.isAudioStarted = isAudioStarted;
-window.getKrarEngine = getKrarEngine;
+window.pluckVoice = pluckVoice;
+window.strikeVoice = strikeVoice;
+window.releaseVoice = releaseVoice;
+window.setVoiceFrequency = setVoiceFrequency;
+window.setMasterVolume = setMasterVolume;
+window.setReverb = setReverb;
 window.resumeAudio = resumeAudio;
 window.getWaveform = getWaveform;

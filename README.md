@@ -58,14 +58,15 @@ to the engine at startup on every platform.
 ### Web
 
 ```
-pointer events → Dart → krar_wasm_bridge.js → WASM KrarEngine
+pointer events → Dart → krar_wasm_bridge.js → postMessage
                                     ↓
-                     AudioWorklet (krar-processor) → AnalyserNode → speakers
+              AudioWorklet (krar-processor, runs WASM KrarEngine) → AnalyserNode → speakers
 ```
 
-The worklet asks the main thread for each 128-frame block over its
-MessagePort, so the engine currently renders on the main thread. Moving it
-inside the worklet is the main open task (see [Known issues](#known-issues)).
+The engine runs inside the worklet, on the audio thread. The main thread
+only posts control messages (pluck, strike, tune, volume, reverb) and never
+touches the engine or waits for a buffer, so a busy UI cannot interrupt the
+sound.
 
 ### iOS
 
@@ -206,9 +207,6 @@ clone.
 
 ## Known issues
 
-- **Web audio still depends on the main thread.** The worklet requests every
-  block over its port, so a busy UI can still interrupt the sound. Running
-  the engine inside the worklet is the fix.
 - **Tizita Major duplicates Tizita Minor's cents** (above).
 - **The simulator slice** covers Apple silicon and Intel; no other desktop
   platform has an audio backend, so the app there reports "Audio unavailable".

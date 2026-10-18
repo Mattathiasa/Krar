@@ -1,32 +1,6 @@
 import 'dart:js_interop';
 import 'package:web/web.dart' as web;
 
-/// The wasm-bindgen `KrarEngine` class. Rust exports snake_case names, so each
-/// member maps to its real export with `@JS`.
-extension type KrarEngineJS._(JSObject _) implements JSObject {
-  external void pluck(int stringId, double velocity);
-  external void strike(int stringId, double velocity);
-  external void release(int stringId);
-  @JS('get_audio_buffer')
-  external JSFloat32Array getAudioBuffer();
-  @JS('get_string_frequency')
-  external double getStringFrequency(int stringId);
-  @JS('set_string_frequency')
-  external void setStringFrequency(int stringId, double frequency);
-  @JS('set_master_volume')
-  external void setMasterVolume(double volume);
-  @JS('get_master_volume')
-  external double getMasterVolume();
-  @JS('set_reverb')
-  external void setReverb(double amount);
-  @JS('get_reverb')
-  external double getReverb();
-  @JS('num_strings')
-  external int numStrings();
-  @JS('get_string_config')
-  external JSFloat32Array getStringConfig(int stringId);
-}
-
 JSFunction? _bridgeFn(String name) => web.window[name] as JSFunction?;
 
 /// The bridge is an ES module loaded next to Flutter's bootstrap, so it may
@@ -55,6 +29,18 @@ Future<void> _callAsyncInt(String name, int arg) async {
   await promise?.toDart;
 }
 
+void _post2(String name, int a, double b) {
+  _bridgeFn(name)?.callAsFunction(null, a.toJS, b.toJS);
+}
+
+void _post1(String name, int a) {
+  _bridgeFn(name)?.callAsFunction(null, a.toJS);
+}
+
+void _postDouble(String name, double v) {
+  _bridgeFn(name)?.callAsFunction(null, v.toJS);
+}
+
 Future<void> initAudioJS() => _callAsync('initAudio');
 
 /// [voices] is the engine's voice count (KrarEngine.voiceCount in Dart).
@@ -69,8 +55,19 @@ bool isAudioStartedJS() {
   return result?.toDart ?? false;
 }
 
-/// The engine instance that feeds the AudioWorklet.
-KrarEngineJS? getKrarEngineJS() => _bridgeFn('getKrarEngine')?.callAsFunction() as KrarEngineJS?;
+// The engine lives inside the AudioWorklet; these post control messages to it.
+
+void pluckVoiceJS(int string, double velocity) => _post2('pluckVoice', string, velocity);
+
+void strikeVoiceJS(int string, double velocity) => _post2('strikeVoice', string, velocity);
+
+void releaseVoiceJS(int string) => _post1('releaseVoice', string);
+
+void setVoiceFrequencyJS(int string, double frequency) => _post2('setVoiceFrequency', string, frequency);
+
+void setMasterVolumeJS(double volume) => _postDouble('setMasterVolume', volume);
+
+void setReverbJS(double amount) => _postDouble('setReverb', amount);
 
 /// Latest output samples from the AnalyserNode, or null before audio starts.
 JSFloat32Array? getWaveformJS() => _bridgeFn('getWaveform')?.callAsFunction() as JSFloat32Array?;

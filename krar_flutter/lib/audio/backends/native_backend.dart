@@ -16,12 +16,6 @@ typedef _U32C = Void Function(Uint32);
 typedef _U32Dart = void Function(int);
 typedef _F32C = Void Function(Float);
 typedef _F32Dart = void Function(double);
-typedef _GetF32C = Float Function();
-typedef _GetF32Dart = double Function();
-typedef _U32GetF32C = Float Function(Uint32);
-typedef _U32GetF32Dart = double Function(int);
-typedef _ConfigC = Void Function(Uint32, Pointer<Float>);
-typedef _ConfigDart = void Function(int, Pointer<Float>);
 typedef _WaveC = Uint32 Function(Pointer<Float>, Uint32);
 typedef _WaveDart = int Function(Pointer<Float>, int);
 
@@ -34,17 +28,12 @@ class _NativeBackend implements KrarBackend {
   late final _U32F32Dart _strike;
   late final _U32Dart _release;
   late final _U32F32Dart _setFrequency;
-  late final _U32GetF32Dart _getFrequency;
   late final _F32Dart _setVolume;
-  late final _GetF32Dart _getVolume;
   late final _F32Dart _setReverb;
-  late final _GetF32Dart _getReverb;
-  late final _ConfigDart _config;
   late final _WaveDart _copyWave;
 
   bool _ready = false;
   Pointer<Float>? _wave;
-  Pointer<Float>? _cfg;
 
   @override
   Future<void> start(int voices) async {
@@ -56,19 +45,14 @@ class _NativeBackend implements KrarBackend {
     _strike = lib.lookupFunction<_U32F32C, _U32F32Dart>('krar_strike');
     _release = lib.lookupFunction<_U32C, _U32Dart>('krar_release');
     _setFrequency = lib.lookupFunction<_U32F32C, _U32F32Dart>('krar_set_string_frequency');
-    _getFrequency = lib.lookupFunction<_U32GetF32C, _U32GetF32Dart>('krar_get_string_frequency');
     _setVolume = lib.lookupFunction<_F32C, _F32Dart>('krar_set_master_volume');
-    _getVolume = lib.lookupFunction<_GetF32C, _GetF32Dart>('krar_get_master_volume');
     _setReverb = lib.lookupFunction<_F32C, _F32Dart>('krar_set_reverb');
-    _getReverb = lib.lookupFunction<_GetF32C, _GetF32Dart>('krar_get_reverb');
-    _config = lib.lookupFunction<_ConfigC, _ConfigDart>('krar_string_config');
     _copyWave = lib.lookupFunction<_WaveC, _WaveDart>('krar_copy_waveform');
 
     final code = lib.lookupFunction<_StartC, _StartDart>('krar_start')(voices);
     if (code != 0) throw StateError('krar_start failed with code $code');
 
     _wave = calloc<Float>(_waveLen);
-    _cfg = calloc<Float>(4);
     _ready = true;
   }
 
@@ -96,29 +80,13 @@ class _NativeBackend implements KrarBackend {
   }
 
   @override
-  double getStringFrequency(int string) => _ready ? _getFrequency(string) : 0;
-
-  @override
   void setMasterVolume(double volume) {
     if (_ready) _setVolume(volume);
   }
 
   @override
-  double getMasterVolume() => _ready ? _getVolume() : 0;
-
-  @override
   void setReverb(double amount) {
     if (_ready) _setReverb(amount);
-  }
-
-  @override
-  double getReverb() => _ready ? _getReverb() : 0;
-
-  @override
-  List<double> stringConfig(int string) {
-    if (!_ready) return const [];
-    _config(string, _cfg!);
-    return _cfg!.asTypedList(4).toList();
   }
 
   @override

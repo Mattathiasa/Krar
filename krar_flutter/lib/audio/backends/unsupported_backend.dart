@@ -24,22 +24,10 @@ class _UnsupportedBackend implements KrarBackend {
   void setStringFrequency(int string, double frequency) {}
 
   @override
-  double getStringFrequency(int string) => 0;
-
-  @override
   void setMasterVolume(double volume) {}
 
   @override
-  double getMasterVolume() => 0;
-
-  @override
   void setReverb(double amount) {}
-
-  @override
-  double getReverb() => 0;
-
-  @override
-  List<double> stringConfig(int string) => const [];
 
   @override
   Float32List waveform() => Float32List(0);

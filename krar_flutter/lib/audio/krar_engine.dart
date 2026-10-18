@@ -12,7 +12,7 @@ class KrarEngine {
 
   /// Voice layout: the begena strings, one preview voice for single notes
   /// (scale degrees, tab playback) so they never retune a string, then a
-  /// pool of piano voices. web/js/krar_wasm_bridge.js uses the same count.
+  /// pool of piano voices.
   static const int stringCount = 5;
   static const int previewVoice = 5;
   static const int firstPianoVoice = 6;
@@ -62,8 +62,6 @@ class KrarEngine {
   /// Output samples for the oscilloscope. Empty before audio starts.
   Float32List waveform() => _isInitialized ? _backend.waveform() : Float32List(0);
 
-  double getStringFrequency(int stringId) => _isInitialized ? _backend.getStringFrequency(stringId) : 0.0;
-
   void setStringFrequency(int stringId, double frequency) {
     if (_isInitialized) _backend.setStringFrequency(stringId, frequency);
   }
@@ -72,17 +70,9 @@ class KrarEngine {
     if (_isInitialized) _backend.setMasterVolume(volume);
   }
 
-  double getMasterVolume() => _isInitialized ? _backend.getMasterVolume() : 0.0;
-
   void setReverb(double amount) {
     if (_isInitialized) _backend.setReverb(amount);
   }
-
-  double getReverb() => _isInitialized ? _backend.getReverb() : 0.0;
-
-  int get numStrings => stringCount;
-
-  List<double> getStringConfig(int stringId) => _isInitialized ? _backend.stringConfig(stringId) : const [];
 
   bool get isInitialized => _isInitialized;
 

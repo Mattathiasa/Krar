@@ -19,14 +19,8 @@ abstract class KrarBackend {
   void strike(int string, double velocity);
   void release(int string);
   void setStringFrequency(int string, double frequency);
-  double getStringFrequency(int string);
   void setMasterVolume(double volume);
-  double getMasterVolume();
   void setReverb(double amount);
-  double getReverb();
-
-  /// [frequency, velocity, isPlucked, decay] for one string.
-  List<double> stringConfig(int string);
 
   /// The most recent output samples, oldest first.
   Float32List waveform();

@@ -6,53 +6,37 @@ import 'web_bridge.dart';
 
 KrarBackend createKrarBackend() => _WebBackend();
 
-/// Drives the WASM engine that web/js/krar_wasm_bridge.js feeds to an AudioWorklet.
+/// Drives the WASM engine that lives inside the AudioWorklet (see
+/// web/js/krar_wasm_bridge.js). Every call is a control message posted to
+/// the worklet; the engine itself never runs on the main thread.
 class _WebBackend implements KrarBackend {
-  KrarEngineJS? _engine;
-
   @override
   Future<void> start(int voices) async {
-    // The bridge builds the engine with this voice count and the context's
-    // real sample rate, so Dart owns the layout and pitch stays correct.
     await waitForBridge();
     await initAudioJS();
     await startAudioJS(voices);
-    _engine = getKrarEngineJS();
-    if (_engine == null) throw StateError('Audio bridge did not expose its engine');
   }
 
   @override
   Future<void> resume() => resumeAudioJS();
 
   @override
-  void pluck(int string, double velocity) => _engine?.pluck(string, velocity);
+  void pluck(int string, double velocity) => pluckVoiceJS(string, velocity);
 
   @override
-  void strike(int string, double velocity) => _engine?.strike(string, velocity);
+  void strike(int string, double velocity) => strikeVoiceJS(string, velocity);
 
   @override
-  void release(int string) => _engine?.release(string);
+  void release(int string) => releaseVoiceJS(string);
 
   @override
-  void setStringFrequency(int string, double frequency) => _engine?.setStringFrequency(string, frequency);
+  void setStringFrequency(int string, double frequency) => setVoiceFrequencyJS(string, frequency);
 
   @override
-  double getStringFrequency(int string) => _engine?.getStringFrequency(string) ?? 0;
+  void setMasterVolume(double volume) => setMasterVolumeJS(volume);
 
   @override
-  void setMasterVolume(double volume) => _engine?.setMasterVolume(volume);
-
-  @override
-  double getMasterVolume() => _engine?.getMasterVolume() ?? 0;
-
-  @override
-  void setReverb(double amount) => _engine?.setReverb(amount);
-
-  @override
-  double getReverb() => _engine?.getReverb() ?? 0;
-
-  @override
-  List<double> stringConfig(int string) => _engine?.getStringConfig(string).toDart.toList() ?? const [];
+  void setReverb(double amount) => setReverbJS(amount);
 
   @override
   Float32List waveform() => getWaveformJS()?.toDart ?? Float32List(0);

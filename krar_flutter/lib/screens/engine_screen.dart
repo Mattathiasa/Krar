@@ -30,8 +30,8 @@ class EngineScreen extends StatelessWidget {
               title: 'AudioWorkletProcessor',
               accent: StudioColors.saffron,
               highlight: true,
-              body: 'krar-processor plays 128-frame blocks, 2.67 ms each at 48 kHz. Today it asks the main thread '
-                  'for each block over its MessagePort; running the engine inside the worklet is the next step.',
+              body: 'krar-processor runs the WASM engine itself and renders 128-frame blocks, 2.67 ms each at 48 kHz. '
+                  'The main thread only posts control messages, so a busy UI cannot interrupt the sound.',
             ),
             _LayerCard(
               n: '03',
