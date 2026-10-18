@@ -1,6 +1,5 @@
 import 'dart:typed_data';
 
-import '../models/qenet.dart';
 import '../models/string_config.dart';
 import 'krar_backend.dart';
 
@@ -58,10 +57,6 @@ class KrarEngine {
 
   void release(int stringId) {
     if (_isInitialized) _backend.release(stringId);
-  }
-
-  void setScale(ScaleType scaleType) {
-    if (_isInitialized) _backend.setScale(scaleType.index);
   }
 
   /// Output samples for the oscilloscope. Empty before audio starts.

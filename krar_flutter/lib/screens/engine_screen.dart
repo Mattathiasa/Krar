@@ -38,7 +38,7 @@ class EngineScreen extends StatelessWidget {
               kicker: 'WebAssembly',
               title: 'Rust KrarEngine',
               accent: StudioColors.terracotta,
-              body: 'Compiled with wasm-bindgen. Owns one string model per voice, the active qenet, and master gain.',
+              body: 'Compiled with wasm-bindgen. Owns one string model per voice, a Schroeder reverb, and master gain.',
             ),
           ]
         : const [
@@ -65,7 +65,7 @@ class EngineScreen extends StatelessWidget {
               title: 'Rust KrarEngine',
               accent: StudioColors.terracotta,
               body: 'The same crate as the web build, compiled for iOS into KrarEngine.framework with a small C ABI. '
-                  'Owns one string model per voice, the active qenet, and master gain.',
+                  'Owns one string model per voice, a Schroeder reverb, and master gain.',
             ),
           ];
     return ListView(

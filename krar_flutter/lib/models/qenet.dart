@@ -3,7 +3,7 @@ import 'dart:ui';
 
 import '../theme/studio_theme.dart';
 
-/// The four Ethiopian qenet (modes). Index order matches the Rust `ScaleType`.
+/// The four Ethiopian qenet (modes).
 enum ScaleType {
   tizitaMinor,
   tizitaMajor,
@@ -46,7 +46,7 @@ extension ScaleTypeExtension on ScaleType {
         ScaleType.bati => StudioColors.green,
       };
 
-  /// Cents from the root for each degree (same table as krar_engine/src/scale.rs).
+  /// Cents from the root for each degree.
   List<double> get cents => switch (this) {
         ScaleType.tizitaMinor || ScaleType.tizitaMajor => const [0, 282, 386, 520, 678, 884, 1018, 1136],
         ScaleType.ambassel => const [0, 182, 316, 520, 678, 812, 1018, 1136],

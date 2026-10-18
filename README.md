@@ -78,14 +78,13 @@ pointer events → Dart → dart:ffi → KrarEngine.framework (Rust)
 The audio thread never waits on the UI: the render callback only `try_lock`s
 the engine, and plays one silent block rather than blocking. The C ABI lives
 in [`krar_engine/src/native.rs`](krar_engine/src/native.rs) (`krar_start`,
-`krar_pluck`, `krar_strike`, `krar_set_scale`, `krar_copy_waveform`, …).
+`krar_pluck`, `krar_strike`, `krar_set_string_frequency`, `krar_copy_waveform`, …).
 
 ---
 
 ## The scales
 
 Cents from the root, as defined in
-[`krar_engine/src/scale.rs`](krar_engine/src/scale.rs) and mirrored in
 [`krar_flutter/lib/models/qenet.dart`](krar_flutter/lib/models/qenet.dart):
 
 | Qenet | Degrees (cents) |
@@ -110,7 +109,7 @@ pages are built to show.
 krar_engine/            Rust DSP crate (WASM + native)
   src/karplus_strong.rs   KrarEngine: voices, mixing, master gain
   src/string_model.rs     One string: pluck, strike, delay-line loop
-  src/scale.rs            The four qenet
+  src/reverb.rs           Schroeder tail for the reverb knob
   src/native.rs           C ABI and CoreAudio output for iOS
   ios/                    build-xcframework.sh and the KrarEngine podspec
 krar_flutter/           Flutter app (web + iOS)
@@ -211,8 +210,6 @@ clone.
   block over its port, so a busy UI can still interrupt the sound. Running
   the engine inside the worklet is the fix.
 - **Tizita Major duplicates Tizita Minor's cents** (above).
-- **The tab editor** behind "Edit tab" predates the redesign: it records every
-  note on string 0 and offers frets, which lyres do not have.
 - **The simulator slice** covers Apple silicon and Intel; no other desktop
   platform has an audio backend, so the app there reports "Audio unavailable".
 

@@ -1,8 +1,6 @@
-use std::collections::HashMap;
 use wasm_bindgen::prelude::*;
 
 use crate::reverb::Reverb;
-use crate::scale::ScaleType;
 use crate::string_model::StringState;
 
 const MIX_GAIN: f32 = 0.35;
@@ -11,9 +9,7 @@ const MIX_GAIN: f32 = 0.35;
 pub struct KrarEngine {
     sample_rate: u32,
     strings: Vec<StringState>,
-    active_scale: ScaleType,
     buffer: Vec<f32>,
-    note_frequencies: HashMap<String, f32>,
     master_volume: f32,
     reverb_amount: f32,
     reverb: Reverb,
@@ -24,19 +20,14 @@ impl KrarEngine {
     pub fn new(sample_rate: u32, num_strings: u32) -> Self {
         let strings = (0..num_strings).map(|_| StringState::new()).collect();
 
-        let mut engine = KrarEngine {
+        KrarEngine {
             sample_rate,
             strings,
-            active_scale: ScaleType::TizitaMinor,
             buffer: vec![0.0; 1024],
-            note_frequencies: HashMap::new(),
             master_volume: 0.8,
             reverb_amount: 0.2,
             reverb: Reverb::new(sample_rate),
-        };
-
-        engine.init_note_frequencies();
-        engine
+        }
     }
 
     pub fn pluck(&mut self, string_id: u32, velocity: f32) {
@@ -57,10 +48,6 @@ impl KrarEngine {
         if let Some(string) = self.strings.get_mut(string_id as usize) {
             string.release();
         }
-    }
-
-    pub fn set_scale(&mut self, scale_type: ScaleType) {
-        self.active_scale = scale_type;
     }
 
     pub fn get_audio_buffer(&mut self) -> Vec<f32> {
@@ -138,36 +125,6 @@ impl KrarEngine {
             ]
         } else {
             vec![0.0; 4]
-        }
-    }
-
-    fn init_note_frequencies(&mut self) {
-        let notes = [
-            ("C2", 65.41),
-            ("D2", 73.42),
-            ("E2", 82.41),
-            ("F2", 87.31),
-            ("G2", 98.00),
-            ("A2", 110.00),
-            ("B2", 123.47),
-            ("C3", 130.81),
-            ("D3", 146.83),
-            ("E3", 164.81),
-            ("F3", 174.61),
-            ("G3", 196.00),
-            ("A3", 220.00),
-            ("B3", 246.94),
-            ("C4", 261.63),
-            ("D4", 293.66),
-            ("E4", 329.63),
-            ("F4", 349.23),
-            ("G4", 392.00),
-            ("A4", 440.00),
-            ("B4", 493.88),
-        ];
-
-        for (note, freq) in notes {
-            self.note_frequencies.insert(note.to_string(), freq as f32);
         }
     }
 }

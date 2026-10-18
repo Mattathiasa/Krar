@@ -32,60 +32,6 @@ fn noise() -> f32 {
 }
 
 #[wasm_bindgen]
-pub struct StringConfig {
-    id: u32,
-    name: String,
-    frequency: f32,
-    tension: f32,
-    length: f32,
-    mass: f32,
-    damping: f32,
-}
-
-#[wasm_bindgen]
-impl StringConfig {
-    pub fn new(id: u32, name: &str, frequency: f32) -> Self {
-        StringConfig {
-            id,
-            name: name.to_string(),
-            frequency,
-            tension: 1.0,
-            length: 1.0,
-            mass: 0.01,
-            damping: 0.001,
-        }
-    }
-
-    pub fn begena_string(id: u32, name: &str, frequency: f32) -> Self {
-        StringConfig {
-            id,
-            name: name.to_string(),
-            frequency,
-            tension: 0.8,
-            length: 0.9,
-            mass: 0.012,
-            damping: 0.0015,
-        }
-    }
-
-    pub fn name(&self) -> String {
-        self.name.clone()
-    }
-
-    pub fn frequency(&self) -> f32 {
-        self.frequency
-    }
-
-    pub fn tension(&self) -> f32 {
-        self.tension
-    }
-
-    pub fn damping(&self) -> f32 {
-        self.damping
-    }
-}
-
-#[wasm_bindgen]
 pub struct StringState {
     pub frequency: f32,
     pub velocity: f32,
@@ -96,14 +42,12 @@ pub struct StringState {
     loop_gain: f32,
     pub phase: f32,
     harmonics: Vec<f32>,
-    harmonic_damping: Vec<f32>,
 }
 
 #[wasm_bindgen]
 impl StringState {
     pub fn new() -> Self {
         let harmonics = vec![1.0, 0.8, 0.6, 0.4, 0.3, 0.2, 0.15, 0.1];
-        let harmonic_damping = vec![0.999, 0.998, 0.997, 0.996, 0.995, 0.994, 0.993, 0.992];
 
         StringState {
             frequency: 440.0,
@@ -115,7 +59,6 @@ impl StringState {
             loop_gain: LOOP_GAIN,
             phase: 0.0,
             harmonics,
-            harmonic_damping,
         }
     }
 
@@ -130,7 +73,8 @@ impl StringState {
             let mut sample = 0.0;
             for (h, &harmonic_amp) in self.harmonics.iter().enumerate() {
                 let harmonic_freq = self.frequency * (h + 1) as f32;
-                let phase = (i as f32 / sample_rate as f32) * harmonic_freq * 2.0 * std::f32::consts::PI;
+                let phase =
+                    (i as f32 / sample_rate as f32) * harmonic_freq * 2.0 * std::f32::consts::PI;
                 sample += phase.sin() * harmonic_amp * noise();
             }
             self.buffer[i] = sample * velocity * 0.25;
@@ -189,7 +133,7 @@ impl StringState {
             return output;
         }
 
-        for i in 0..block_size {
+        for out in output.iter_mut() {
             let current_sample = self.buffer[self.buffer_index];
             let next_index = (self.buffer_index + 1) % self.buffer.len();
             let next_sample = self.buffer[next_index];
@@ -199,7 +143,7 @@ impl StringState {
 
             self.buffer[self.buffer_index] = filtered;
 
-            output[i] = current_sample * self.velocity;
+            *out = current_sample * self.velocity;
 
             self.buffer_index = next_index;
 

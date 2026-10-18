@@ -33,7 +33,6 @@ class _NativeBackend implements KrarBackend {
   late final _U32F32Dart _pluck;
   late final _U32F32Dart _strike;
   late final _U32Dart _release;
-  late final _U32Dart _setScale;
   late final _U32F32Dart _setFrequency;
   late final _U32GetF32Dart _getFrequency;
   late final _F32Dart _setVolume;
@@ -56,7 +55,6 @@ class _NativeBackend implements KrarBackend {
     _pluck = lib.lookupFunction<_U32F32C, _U32F32Dart>('krar_pluck');
     _strike = lib.lookupFunction<_U32F32C, _U32F32Dart>('krar_strike');
     _release = lib.lookupFunction<_U32C, _U32Dart>('krar_release');
-    _setScale = lib.lookupFunction<_U32C, _U32Dart>('krar_set_scale');
     _setFrequency = lib.lookupFunction<_U32F32C, _U32F32Dart>('krar_set_string_frequency');
     _getFrequency = lib.lookupFunction<_U32GetF32C, _U32GetF32Dart>('krar_get_string_frequency');
     _setVolume = lib.lookupFunction<_F32C, _F32Dart>('krar_set_master_volume');
@@ -90,11 +88,6 @@ class _NativeBackend implements KrarBackend {
   @override
   void release(int string) {
     if (_ready) _release(string);
-  }
-
-  @override
-  void setScale(int scaleIndex) {
-    if (_ready) _setScale(scaleIndex);
   }
 
   @override

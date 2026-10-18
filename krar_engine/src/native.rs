@@ -10,7 +10,6 @@ use std::sync::{Mutex, OnceLock};
 use cpal::traits::{DeviceTrait, HostTrait, StreamTrait};
 
 use crate::karplus_strong::KrarEngine;
-use crate::scale::ScaleType;
 
 const WAVE_LEN: usize = 1024;
 
@@ -58,8 +57,12 @@ pub extern "C" fn krar_start(num_voices: u32) -> i32 {
         return 0;
     }
     let host = cpal::default_host();
-    let Some(device) = host.default_output_device() else { return -1 };
-    let Ok(config) = device.default_output_config() else { return -2 };
+    let Some(device) = host.default_output_device() else {
+        return -1;
+    };
+    let Ok(config) = device.default_output_config() else {
+        return -2;
+    };
     if config.sample_format() != cpal::SampleFormat::F32 {
         return -2;
     }
@@ -118,18 +121,6 @@ pub extern "C" fn krar_strike(string_id: u32, velocity: f32) {
 #[no_mangle]
 pub extern "C" fn krar_release(string_id: u32) {
     with_engine((), |s| s.engine.release(string_id));
-}
-
-/// 0 Tizita Minor, 1 Tizita Major, 2 Ambassel, 3 Bati.
-#[no_mangle]
-pub extern "C" fn krar_set_scale(scale: u32) {
-    let scale = match scale {
-        1 => ScaleType::TizitaMajor,
-        2 => ScaleType::Ambassel,
-        3 => ScaleType::Bati,
-        _ => ScaleType::TizitaMinor,
-    };
-    with_engine((), |s| s.engine.set_scale(scale));
 }
 
 #[no_mangle]

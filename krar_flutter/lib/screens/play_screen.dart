@@ -35,7 +35,6 @@ class _PlayScreenState extends State<PlayScreen> {
 
   void _setScale(ScaleType s) {
     setState(() => _scale = s);
-    widget.engine.setScale(s);
   }
 
   void _playDegree(int i) {

@@ -33,9 +33,6 @@ class _WebBackend implements KrarBackend {
   void release(int string) => _engine?.release(string);
 
   @override
-  void setScale(int scaleIndex) => _engine?.setScale(scaleIndex);
-
-  @override
   void setStringFrequency(int string, double frequency) => _engine?.setStringFrequency(string, frequency);
 
   @override

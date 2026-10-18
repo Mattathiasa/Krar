@@ -7,7 +7,6 @@ import '../audio/krar_engine.dart';
 import '../models/qenet.dart';
 import '../theme/studio_theme.dart';
 import '../widgets/studio_widgets.dart';
-import 'tab_editor_screen.dart';
 
 /// Krar strings for the lesson, tuned to Tizita Minor above G3.
 const double kKrarRoot = 196.0;
@@ -174,18 +173,6 @@ class _TutorScreenState extends State<TutorScreen> with SingleTickerProviderStat
                   Text('Two-bar phrase', style: StudioText.display(wide ? 52 : 38)),
                 ],
               ),
-            ),
-            OutlinedButton(
-              onPressed: () => Navigator.of(context).push(
-                MaterialPageRoute<void>(builder: (_) => TabEditorScreen(engine: widget.engine)),
-              ),
-              style: OutlinedButton.styleFrom(
-                minimumSize: const Size(44, 44),
-                foregroundColor: StudioColors.text,
-                side: const BorderSide(color: StudioColors.line),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-              ),
-              child: const Text('Edit tab'),
             ),
           ],
         ),

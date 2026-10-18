@@ -21,9 +21,6 @@ class _UnsupportedBackend implements KrarBackend {
   void release(int string) {}
 
   @override
-  void setScale(int scaleIndex) {}
-
-  @override
   void setStringFrequency(int string, double frequency) {}
 
   @override

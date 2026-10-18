@@ -7,8 +7,6 @@ extension type KrarEngineJS._(JSObject _) implements JSObject {
   external void pluck(int stringId, double velocity);
   external void strike(int stringId, double velocity);
   external void release(int stringId);
-  @JS('set_scale')
-  external void setScale(int scaleType);
   @JS('get_audio_buffer')
   external JSFloat32Array getAudioBuffer();
   @JS('get_string_frequency')
