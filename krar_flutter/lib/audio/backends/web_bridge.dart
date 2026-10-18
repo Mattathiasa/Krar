@@ -48,9 +48,17 @@ Future<void> _callAsync(String name) async {
   await promise?.toDart;
 }
 
+Future<void> _callAsyncInt(String name, int arg) async {
+  final fn = _bridgeFn(name);
+  if (fn == null) return;
+  final promise = fn.callAsFunction(null, arg.toJS) as JSPromise<JSAny?>?;
+  await promise?.toDart;
+}
+
 Future<void> initAudioJS() => _callAsync('initAudio');
 
-Future<void> startAudioJS() => _callAsync('startAudio');
+/// [voices] is the engine's voice count (KrarEngine.voiceCount in Dart).
+Future<void> startAudioJS(int voices) => _callAsyncInt('startAudio', voices);
 
 Future<void> stopAudioJS() => _callAsync('stopAudio');
 

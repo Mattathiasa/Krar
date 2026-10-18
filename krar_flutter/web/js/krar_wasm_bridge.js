@@ -5,10 +5,6 @@ let audioContext = null;
 let audioWorkletNode = null;
 let analyser = null;
 let waveform = null;
-
-// 5 begena strings, one preview voice for scale degrees and tab playback,
-// and 8 piano voices. Matches KrarEngine.voiceCount in Dart.
-const NUM_VOICES = 14;
 let isStarted = false;
 
 export async function initAudio() {
@@ -21,13 +17,14 @@ export async function initAudio() {
   }
 }
 
-export async function startAudio() {
+// voices: the engine's voice count, owned by Dart (KrarEngine.voiceCount).
+export async function startAudio(voices) {
   try {
     if (isStarted) return;
 
-    audioContext = new (window.AudioContext || window.webkitAudioContext)({
-      sampleRate: 48000,
-    });
+    // No forced rate: whatever the device gives us, the engine is built to
+    // match, so pitch stays correct on hardware that won't do 48 kHz.
+    audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
     await audioContext.audioWorklet.addModule('js/audio_processor.js');
 
@@ -38,7 +35,10 @@ export async function startAudio() {
     });
 
     // Rust `new` is a static factory, not a wasm-bindgen constructor.
-    engine = KrarEngine.new(48000, NUM_VOICES);
+    engine = KrarEngine.new(audioContext.sampleRate, voices);
+    if (engine.num_strings() !== voices) {
+      throw new Error(`engine created ${engine.num_strings()} voices, expected ${voices}`);
+    }
 
     audioWorkletNode.port.onmessage = (event) => {
       if (event.data.type === 'getBuffer') {

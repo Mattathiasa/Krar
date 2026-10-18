@@ -12,10 +12,11 @@ class _WebBackend implements KrarBackend {
 
   @override
   Future<void> start(int voices) async {
-    // The bridge creates its engine with a fixed voice count (NUM_VOICES).
+    // The bridge builds the engine with this voice count and the context's
+    // real sample rate, so Dart owns the layout and pitch stays correct.
     await waitForBridge();
     await initAudioJS();
-    await startAudioJS();
+    await startAudioJS(voices);
     _engine = getKrarEngineJS();
     if (_engine == null) throw StateError('Audio bridge did not expose its engine');
   }

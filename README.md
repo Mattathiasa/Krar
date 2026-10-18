@@ -52,8 +52,8 @@ The engine is created with 14 voices:
 | 5 | Preview voice for single notes (scale degrees, tab playback), so they never retune a string |
 | 6–13 | Piano pool, taken round robin, so chords and glissandi ring together |
 
-`KrarEngine.voiceCount` in Dart and `NUM_VOICES` in
-`krar_flutter/web/js/krar_wasm_bridge.js` must agree.
+`KrarEngine.voiceCount` in Dart is the single source of truth: it is passed
+to the engine at startup on every platform.
 
 ### Web
 
