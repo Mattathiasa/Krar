@@ -59,3 +59,33 @@ jobs:
 
       - name: Test
         run: cd krar_flutter && flutter test
+
+  ios:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-apple-ios,aarch64-apple-ios-sim,x86_64-apple-ios
+
+      - name: Cache cargo
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            krar_engine/target
+          key: cargo-ios-${{ hashFiles('krar_engine/Cargo.lock') }}
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Build the Rust engine as an XCFramework
+        run: ./krar_engine/ios/build-xcframework.sh
+
+      - name: Build the iOS app
+        run: cd krar_flutter && flutter build ios --simulator --debug
