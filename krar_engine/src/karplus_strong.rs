@@ -1,6 +1,7 @@
-use wasm_bindgen::prelude::*;
 use std::collections::HashMap;
+use wasm_bindgen::prelude::*;
 
+use crate::reverb::Reverb;
 use crate::scale::ScaleType;
 use crate::string_model::StringState;
 
@@ -15,14 +16,13 @@ pub struct KrarEngine {
     note_frequencies: HashMap<String, f32>,
     master_volume: f32,
     reverb_amount: f32,
+    reverb: Reverb,
 }
 
 #[wasm_bindgen]
 impl KrarEngine {
     pub fn new(sample_rate: u32, num_strings: u32) -> Self {
-        let strings = (0..num_strings)
-            .map(|_| StringState::new())
-            .collect();
+        let strings = (0..num_strings).map(|_| StringState::new()).collect();
 
         let mut engine = KrarEngine {
             sample_rate,
@@ -32,6 +32,7 @@ impl KrarEngine {
             note_frequencies: HashMap::new(),
             master_volume: 0.8,
             reverb_amount: 0.2,
+            reverb: Reverb::new(sample_rate),
         };
 
         engine.init_note_frequencies();
@@ -77,9 +78,18 @@ impl KrarEngine {
         }
 
         // Fixed headroom plus a soft clip, rather than dividing by the voice
-        // count, which made everything quieter as voices were added.
+        // count, which made everything quieter as voices were added. The
+        // Schroeder tail is blended in before the clip so it stays bounded.
+        let amount = self.reverb_amount;
         for sample in self.buffer.iter_mut() {
-            *sample = (*sample * MIX_GAIN * self.master_volume).tanh();
+            let dry = *sample * MIX_GAIN * self.master_volume;
+            let out = if amount > 0.001 {
+                let wet = self.reverb.process(dry);
+                dry * (1.0 - amount * 0.5) + wet * amount
+            } else {
+                dry
+            };
+            *sample = out.tanh();
         }
 
         self.buffer.clone()
@@ -133,12 +143,27 @@ impl KrarEngine {
 
     fn init_note_frequencies(&mut self) {
         let notes = [
-            ("C2", 65.41), ("D2", 73.42), ("E2", 82.41), ("F2", 87.31),
-            ("G2", 98.00), ("A2", 110.00), ("B2", 123.47),
-            ("C3", 130.81), ("D3", 146.83), ("E3", 164.81), ("F3", 174.61),
-            ("G3", 196.00), ("A3", 220.00), ("B3", 246.94),
-            ("C4", 261.63), ("D4", 293.66), ("E4", 329.63), ("F4", 349.23),
-            ("G4", 392.00), ("A4", 440.00), ("B4", 493.88),
+            ("C2", 65.41),
+            ("D2", 73.42),
+            ("E2", 82.41),
+            ("F2", 87.31),
+            ("G2", 98.00),
+            ("A2", 110.00),
+            ("B2", 123.47),
+            ("C3", 130.81),
+            ("D3", 146.83),
+            ("E3", 164.81),
+            ("F3", 174.61),
+            ("G3", 196.00),
+            ("A3", 220.00),
+            ("B3", 246.94),
+            ("C4", 261.63),
+            ("D4", 293.66),
+            ("E4", 329.63),
+            ("F4", 349.23),
+            ("G4", 392.00),
+            ("A4", 440.00),
+            ("B4", 493.88),
         ];
 
         for (note, freq) in notes {

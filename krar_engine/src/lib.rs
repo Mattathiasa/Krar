@@ -1,6 +1,7 @@
 use wasm_bindgen::prelude::*;
 
 mod karplus_strong;
+mod reverb;
 mod scale;
 mod string_model;
 

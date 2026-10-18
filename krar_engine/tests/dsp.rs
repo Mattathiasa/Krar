@@ -236,3 +236,38 @@ fn out_of_range_voices_are_ignored() {
     assert_eq!(engine.get_string_frequency(99), 0.0);
     assert_eq!(engine.num_strings(), 5);
 }
+
+#[test]
+fn reverb_amount_is_clamped() {
+    let mut engine = KrarEngine::new(SAMPLE_RATE, 1);
+    engine.set_reverb(5.0);
+    assert_eq!(engine.get_reverb(), 1.0);
+    engine.set_reverb(-1.0);
+    assert_eq!(engine.get_reverb(), 0.0);
+}
+
+#[test]
+fn reverb_extends_the_tail() {
+    let tail_rms = |amount: f32| {
+        let mut e = KrarEngine::new(SAMPLE_RATE, 1);
+        e.set_string_frequency(0, 220.0);
+        e.set_reverb(amount);
+        e.pluck(0, 1.0);
+        e.release(0);
+
+        // ~1.7 s: past several envelope half-lives, so the dry string is
+        // nearly gone and only the reverb tail can still be ringing.
+        let mut signal = Vec::new();
+        for _ in 0..640 {
+            signal.extend(e.get_audio_buffer());
+        }
+        rms(&signal[signal.len() - SAMPLE_RATE as usize..])
+    };
+
+    let dry = tail_rms(0.0);
+    let wet = tail_rms(1.0);
+    assert!(
+        wet > dry * 1.5,
+        "reverb should leave an audible tail: dry={dry}, wet={wet}"
+    );
+}

@@ -211,7 +211,6 @@ clone.
   block over its port, so a busy UI can still interrupt the sound. Running
   the engine inside the worklet is the fix.
 - **Tizita Major duplicates Tizita Minor's cents** (above).
-- **Reverb is a no-op.** The engine stores the amount but does not apply it.
 - **The tab editor** behind "Edit tab" predates the redesign: it records every
   note on string 0 and offers frets, which lyres do not have.
 - **The simulator slice** covers Apple silicon and Intel; no other desktop
