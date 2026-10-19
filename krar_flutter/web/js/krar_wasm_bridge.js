@@ -1,20 +1,31 @@
-import init from '../pkg/krar_engine.js';
-
 let audioContext = null;
 let audioWorkletNode = null;
 let analyser = null;
 let waveform = null;
 let isStarted = false;
+let wasmBytes = null;
+
+async function loadWasmBytes() {
+  if (wasmBytes) return wasmBytes;
+  // The worklet realm has no fetch or URL, so the main thread loads the
+  // bytes once and hands them over through processorOptions, where the
+  // wasm-bindgen init accepts them without a network call.
+  const response = await fetch(
+    new URL('../pkg/krar_engine_bg.wasm', import.meta.url),
+  );
+  if (!response.ok) {
+    throw new Error(`failed to fetch engine wasm: ${response.status}`);
+  }
+  wasmBytes = await response.arrayBuffer();
+  return wasmBytes;
+}
 
 export async function initAudio() {
   try {
-    // The worklet compiles its own copy of the engine from here; the glue
-    // fetches the wasm relative to this module, so no plumbing is needed.
-    // This warms the main-thread copy so the first pluck is not late.
-    await init();
-    console.log('WASM module initialized');
+    await loadWasmBytes();
+    console.log('WASM bytes loaded');
   } catch (error) {
-    console.error('Failed to initialize WASM:', error);
+    console.error('Failed to load WASM bytes:', error);
     throw error;
   }
 }
@@ -23,6 +34,7 @@ export async function initAudio() {
 export async function startAudio(voices) {
   try {
     if (isStarted) return;
+    if (!wasmBytes) await loadWasmBytes();
 
     // No forced rate: the engine is built inside the worklet at that
     // worklet's own sampleRate, so pitch stays correct on hardware that
@@ -35,7 +47,7 @@ export async function startAudio(voices) {
       numberOfInputs: 0,
       numberOfOutputs: 1,
       outputChannelCount: [2],
-      processorOptions: { voices },
+      processorOptions: { voices, wasm: wasmBytes },
     });
 
     analyser = audioContext.createAnalyser();

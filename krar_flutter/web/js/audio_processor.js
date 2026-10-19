@@ -1,7 +1,13 @@
 // Runs the WASM string engine on the audio thread, so a busy UI can no
 // longer interrupt the sound. The main thread only sends control messages
-// (and the voice count at construction); it never waits for a buffer.
+// (and the wasm bytes + voice count at construction); it never waits for a
+// buffer.
 
+// The shim must come first: AudioWorkletGlobalScope has no TextDecoder, and
+// the wasm-bindgen glue constructs one at module top level. Module
+// evaluation order runs dependencies in import order, so the shim installs
+// the global before the glue evaluates.
+import './worklet_text_decoder.js';
 import init, { KrarEngine } from '../pkg/krar_engine.js';
 
 let engine = null;
@@ -39,17 +45,23 @@ class KrarProcessor extends AudioWorkletProcessor {
     super();
     const processorOptions = options?.processorOptions ?? {};
     const voices = processorOptions.voices ?? 0;
+    const wasm = processorOptions.wasm;
 
     if (!voices) {
       throw new Error('krar-processor needs processorOptions.voices');
     }
+    if (!wasm) {
+      throw new Error('krar-processor needs processorOptions.wasm');
+    }
 
     this.port.onmessage = (event) => handleMessage(event.data);
-    this._ready = this._setup(voices);
+    this._ready = this._setup(voices, wasm);
   }
 
-  async _setup(voices) {
-    await init();
+  async _setup(voices, wasm) {
+    // The worklet realm has WebAssembly but no fetch/URL, so the main
+    // thread hands the bytes over; init compiles them right here.
+    await init({ module_or_path: wasm });
     // Rust `new` is a static factory, not a wasm-bindgen constructor.
     // `sampleRate` is this worklet's own rate, so the delay lines are cut
     // for the hardware we actually got, whatever it is.
